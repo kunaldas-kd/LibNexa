@@ -1,2 +1,2 @@
-# LibNexa
-LibNexa is a desktop-based Library Management System built with Python (pywebview) and HTML/CSS/JS. It manages books, students, teachers, borrowing, fines, and financial records with a clean UI, bulk upload support, and secure OTP-based settings—ideal for schools and institutions.
+# Library-Management-System
+A Library Management System (LMS) helps streamline library operations like cataloging, user registration, borrowing/returning books, and fine management. It includes features such as catalog management, user profiles, notifications for due dates, inventory control, and generates reports for better insights.
