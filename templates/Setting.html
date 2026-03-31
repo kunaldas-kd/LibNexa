@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚙️ Settings & OTP Verification</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #f1f5f9;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --surface: rgba(255, 255, 255, 0.9);
+            --border: rgba(148, 163, 184, 0.2);
+            --shadow: rgba(0, 0, 0, 0.1);
+            --shadow-lg: rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #2C3E50 0%, #34495E 35%, #3498DB 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+            padding: 20px 0;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Processing Overlay - Fixed positioning */
+        .processing-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            flex-direction: column;
+        }
+
+        .processing-content {
+            /* background: rgba(206, 18, 18, 0); */
+            /* padding: 40px; */
+            /* border-radius: 20px; */
+            text-align: center;
+            /* box-shadow: 0 25px 50px -12px var(--shadow-lg); */
+            /* border: 1px solid var(--border); */
+            backdrop-filter: blur(20px);
+            width: 400px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 90vw;
+        }
+
+        .processing-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid white;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        .processing-text {
+            display: none;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .processing-subtitle {
+            display: none;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Animated background elements */
+        .bg-decoration {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .bg-decoration::before,
+        .bg-decoration::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .bg-decoration::before {
+            width: 400px;
+            height: 400px;
+            top: -200px;
+            right: -200px;
+            animation-delay: -3s;
+        }
+
+        .bg-decoration::after {
+            width: 300px;
+            height: 300px;
+            bottom: -150px;
+            left: -150px;
+            animation-delay: -6s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(180deg); }
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-primary);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            box-shadow: 0 4px 6px -1px var(--shadow);
+        }
+
+        .back-btn:hover:not(:disabled) {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 10px 25px -3px var(--shadow-lg);
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .back-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .form-container {
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            padding: 48px 40px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 800px;
+            box-shadow: 0 25px 50px -12px var(--shadow-lg);
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .otp-container {
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            padding: 48px 40px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 25px 50px -12px var(--shadow-lg);
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .status {
+            margin-bottom: 24px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 14px;
+            min-height: 20px;
+            padding: 12px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .status.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .status.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .status.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .status:empty {
+            display: none;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            margin-left: 4px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 18px;
+            z-index: 2;
+        }
+
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 16px 16px 16px 52px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 400;
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            transform: translateY(-1px);
+        }
+
+        input:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        input::placeholder {
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Toggle Switch */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 0;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .toggle-container label {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .toggle-switch {
+            width: 60px;
+            height: 32px;
+            background: #e2e8f0;
+            border-radius: 32px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle-switch::before {
+            content: '';
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            background: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.active {
+            background: linear-gradient(135deg, var(--success), #059669);
+        }
+
+        .toggle-switch.active::before {
+            transform: translateX(28px);
+        }
+
+        .toggle-switch.loading {
+            position: relative;
+        }
+
+        .toggle-switch.loading::before {
+            background: transparent !important;
+        }
+
+        .toggle-switch:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Button Loader */
+        .btn-loader {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 16px 24px;
+            border-radius: 12px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-width: 120px;
+        }
+
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover:not(:disabled)::before {
+            left: 100%;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.4);
+            flex: 1;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            box-shadow: 0 8px 25px 0 rgba(99, 102, 241, 0.5);
+        }
+
+        .logout {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 6px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            outline: none;
+            background-color: transparent;
+            color: white;
+            box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
+            min-width: 72px;
+        }
+
+        .restore{
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 6px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            outline: none;
+            background-color: transparent;
+            color: white;
+            box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
+            min-width: 10px;
+            position: relative;
+        }
+
+        .restore:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .logout:hover:not(:disabled), .restore:hover:not(:disabled) {
+            background-color: #c8233300;
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .restore:active,.logout:active {
+            background-color: rgba(220, 53, 70, 0);
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
+        }
+
+        .logout:focus, .restore:focus{
+            box-shadow: 0 0 0 3px rgba(220, 53, 70, 0);
+        }
+
+        .logout img{
+            width: 60px;
+            height: 60px;
+        }
+
+        .restore img {
+            width: 60px;
+            height: 60px;
+        }
+
+        .logout img:only-child {
+            margin-right: 0;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* OTP specific styles */
+        .otp-container h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .otp-container .subtitle {
+            margin-bottom: 32px;
+        }
+
+        .otp-input {
+            padding: 16px !important;
+            text-align: center;
+            font-size: 24px;
+            letter-spacing: 8px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .otp-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* .loader {
+            display: block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgb(0, 255, 255);
+            border-radius: 50%;
+            border-top-color: rgb(0, 4, 255);
+            animation: spin 1s linear infinite;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        } */
+
+        /* Ensure spinner stays in center even on small screens */
+        @media (max-width: 768px) {
+            .form-container, .otp-container {
+                margin: 10px;
+                padding: 32px 24px;
+                max-width: none;
+            }
+
+            .header-title {
+                font-size: 24px;
+            }
+
+            .back-btn {
+                top: 16px;
+                left: 16px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                min-width: auto;
+            }
+
+            input[type="number"], input[type="text"] {
+                padding: 14px 14px 14px 48px;
+                font-size: 16px;
+            }
+
+            .input-icon {
+                left: 14px;
+                font-size: 16px;
+            }
+
+            .processing-content {
+                padding: 30px 20px;
+                width: 320px;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            .processing-spinner {
+                width: 50px;
+                height: 50px;
+                margin: 0 auto 15px;
+            }
+
+            .processing-text {
+                font-size: 16px;
+            }
+
+            .processing-subtitle {
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .form-container, .otp-container {
+                margin: 5px;
+                padding: 24px 16px;
+            }
+
+            .form-grid {
+                gap: 16px;
+            }
+
+            .toggle-container {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+
+            .processing-content {
+                width: 280px;
+                padding: 25px 15px;
+            }
+
+            .processing-spinner {
+                width: 45px;
+                height: 45px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-decoration"></div>
+    
+    <!-- Processing Overlay -->
+    <div class="processing-overlay" id="processing-overlay">
+        <div class="processing-content">
+            <div class="processing-spinner"></div>
+            <div class="processing-text" id="processing-text">Processing...</div>
+            <div class="processing-subtitle">Please wait while we complete your request</div>
+        </div>
+    </div>
+    
+    <button class="back-btn" onclick="goBack()" aria-label="Go back">
+        ←
+    </button>
+
+    <!-- Settings Section -->
+    <div class="form-container" id="settingsSection">
+        <div class="header-section">
+            <h1 class="header-title">⚙️ Settings</h1>
+            <p class="subtitle">Configure your library system preferences</p>
+        </div>
+
+        <div id="status-msg" class="status"></div>
+
+        <div class="toggle-container">
+            <label for="paymentToggle">Payment Functionality</label>
+            <div class="toggle-switch" id="paymentToggle"></div>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="numBooks">Number of Books</label>
+                <div class="input-wrapper">
+                    <div class="input-icon">📚</div>
+                    <input type="number" id="numBooks" placeholder="e.g., 5">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="lateFine">Late Fine Amount (₹)</label>
+                <div class="input-wrapper">
+                    <div class="input-icon">💰</div>
+                    <input type="number" id="lateFine" placeholder="e.g., 2.00" step="0.01">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="borrowPeriod">Borrowing Period (Days)</label>
+                <div class="input-wrapper">
+                    <div class="input-icon">📅</div>
+                    <input type="number" id="borrowPeriod" placeholder="e.g., 14">
+                </div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-primary" id="saveBtn" onclick="saveSettings()">
+                💾 Save Settings
+            </button>
+        </div>
+
+        <div class="action-buttons">
+            <button class="restore" id="restore-btn" onclick="restore()">
+                <img src="{{restore_logo}}" alt="restore">
+            </button>
+            <button class="logout" onclick="logout()">
+                <img src="{{logo_path}}" alt="logout">
+            </button>
+        </div>
+    </div>
+
+    <!-- OTP Section -->
+    <div class="otp-container hidden" id="otpSection">
+        <div class="header-section">
+            <h2>🔐 Enter OTP</h2>
+            <p class="subtitle">Enter the 6-digit code sent to your device</p>
+        </div>
+
+        <div id="otp-status-msg" class="status"></div>
+
+        <div class="input-wrapper">
+            <input type="text" id="otpInput" class="otp-input" placeholder="000000" maxlength="6" />
+        </div>
+
+        <div class="otp-buttons">
+            <button class="btn btn-primary" onclick="verifyOTP()">
+                ✅ Verify OTP
+            </button>
+            <button class="btn btn-secondary" onclick="resendOTP()">
+                🔄 Resend OTP
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Global processing state
+        let isProcessing = false;
+        let originalSettings = {}; // Store original settings
+        let hasChanges = false; // Track if there are unsaved changes
+
+        function setProcessingState(isActive, message = "Processing...") {
+            isProcessing = isActive;
+            const overlay = document.getElementById("processing-overlay");
+            const processingText = document.getElementById("processing-text");
+            
+            if (isActive) {
+                processingText.textContent = message;
+                overlay.style.display = "flex";
+                disableAllButtons();
+            } else {
+                overlay.style.display = "none";
+                enableAllButtons();
+            }
+        }
+
+        function disableAllButtons() {
+            // Main action buttons
+            document.getElementById("saveBtn").disabled = true;
+            document.querySelector(".back-btn").disabled = true;
+
+            // Toggle switch
+            document.getElementById("paymentToggle").style.pointerEvents = "none";
+
+            // Action buttons
+            document.getElementById("restore-btn").disabled = true;
+            document.querySelector(".logout").disabled = true;
+
+            // Form inputs
+            const inputs = document.querySelectorAll("input");
+            inputs.forEach(input => input.disabled = true);
+
+            // OTP buttons
+            const otpButtons = document.querySelectorAll(".otp-buttons button");
+            otpButtons.forEach(btn => btn.disabled = true);
+        }
+
+        function enableAllButtons() {
+            // Main action buttons - Save button will be controlled separately
+            document.querySelector(".back-btn").disabled = false;
+
+            // Toggle switch
+            document.getElementById("paymentToggle").style.pointerEvents = "auto";
+
+            // Action buttons
+            document.getElementById("restore-btn").disabled = false;
+            document.querySelector(".logout").disabled = false;
+
+            // Form inputs
+            const inputs = document.querySelectorAll("input");
+            inputs.forEach(input => input.disabled = false);
+
+            // Re-apply payment toggle state to late fine input
+            const paymentToggle = document.getElementById("paymentToggle");
+            const lateFineInput = document.getElementById("lateFine");
+            if (!paymentToggle.classList.contains("active")) {
+                lateFineInput.disabled = true;
+            }
+
+            // OTP buttons
+            const otpButtons = document.querySelectorAll(".otp-buttons button");
+            otpButtons.forEach(btn => btn.disabled = false);
+
+            // Update save button state based on changes
+            updateSaveButtonState();
+        }
+
+        function checkForChanges() {
+            const currentBooks = document.getElementById("numBooks").value.trim();
+            const currentFine = document.getElementById("lateFine").value.trim();
+            const currentPeriod = document.getElementById("borrowPeriod").value.trim();
+
+            const booksChanged = currentBooks !== (originalSettings["number of books"]?.toString() || "");
+            const fineChanged = currentFine !== (originalSettings["late fine"]?.toString() || "");
+            const periodChanged = currentPeriod !== (originalSettings["borrow period"]?.toString() || "");
+
+            hasChanges = booksChanged || fineChanged || periodChanged;
+            updateSaveButtonState();
+        }
+
+        function updateSaveButtonState() {
+            const saveBtn = document.getElementById("saveBtn");
+            if (isProcessing) {
+                saveBtn.disabled = true;
+            } else {
+                saveBtn.disabled = !hasChanges;
+                
+                // Visual feedback for button state
+                if (hasChanges) {
+                    saveBtn.style.opacity = "1";
+                    saveBtn.style.cursor = "pointer";
+                } else {
+                    saveBtn.style.opacity = "0.5";
+                    saveBtn.style.cursor = "not-allowed";
+                }
+            }
+        }
+
+        function storeOriginalSettings(settings) {
+            originalSettings = {
+                "late fine": settings["late fine"] ?? "",
+                "borrow period": settings["borrow period"] ?? "",
+                "number of books": settings["number of books"] ?? ""
+            };
+            hasChanges = false;
+            updateSaveButtonState();
+        }
+
+        function showMessage(message, type = "success", container = "status-msg") {
+            const msgBox = document.getElementById(container);
+            msgBox.textContent = message;
+            msgBox.className = `status ${type}`;
+            
+            setTimeout(() => {
+                msgBox.textContent = "";
+                msgBox.className = "status";
+            }, 5000);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const paymentToggle = document.getElementById("paymentToggle");
+            const saveBtn = document.getElementById("saveBtn");
+            const settingsSection = document.getElementById("settingsSection");
+            const otpSection = document.getElementById("otpSection");
+
+            let books, fine, period;
+            let isForPaymentToggle = false;
+            let paymentStatus;
+
+            // Initially disable save button
+            saveBtn.disabled = true;
+            updateSaveButtonState();
+
+            // Add input event listeners to track changes
+            const inputs = ["numBooks", "lateFine", "borrowPeriod"];
+            inputs.forEach(inputId => {
+                const input = document.getElementById(inputId);
+                input.addEventListener('input', checkForChanges);
+                input.addEventListener('change', checkForChanges);
+            });
+
+            // === Immediately fetch settings once API is available ===
+            function waitForAPI(callback) {
+                if (window.pywebview?.api?.fetch_payment_settings) {
+                    callback();
+                } else {
+                    setTimeout(() => waitForAPI(callback), 100);
+                }
+            }
+
+            waitForAPI(fetchInitialSettings);
+
+            function fetchInitialSettings() {
+                setProcessingState(true, "Loading settings...");
+                window.pywebview.api.fetch_payment_settings()
+                    .then(settings => {
+                        if (!settings) return;
+
+                        // Autofill fields
+                        document.getElementById("lateFine").value = settings["late fine"] ?? "";
+                        document.getElementById("borrowPeriod").value = settings["borrow period"] ?? "";
+                        document.getElementById("numBooks").value = settings["number of books"] ?? "";
+
+                        // Store original settings for comparison
+                        storeOriginalSettings(settings);
+
+                        // Toggle payment state from "payment status"
+                        const isEnabled = settings["payment status"] === 1 || settings["payment status"] === true;
+                        paymentToggle.classList.toggle("active", isEnabled);
+                        document.getElementById("lateFine").disabled = !isEnabled;
+                    })
+                    .catch(err => {
+                        console.error("Failed to fetch payment settings:", err);
+                        showMessage("❌ Failed to load settings.", "error");
+                    })
+                    .finally(() => {
+                        setProcessingState(false);
+                    });
+            }
+
+            // === Toggle Payment Status Handler ===
+            paymentToggle.addEventListener("click", async () => {
+                if (isProcessing) return;
+
+                const isActive = paymentToggle.classList.toggle("active");
+                paymentStatus = isActive ? 1 : 0;
+                document.getElementById("lateFine").disabled = !isActive;
+
+                setProcessingState(true, isActive ? "Enabling payment..." : "Disabling payment...");
+
+                if (isActive) {
+                    try {
+                        const otpResponse = await window.pywebview.api.enabling_the_payment_function(paymentStatus);
+                        if (otpResponse?.status === "otp_sent") {
+                            isForPaymentToggle = true;
+                            settingsSection.classList.add("hidden");
+                            otpSection.classList.remove("hidden");
+                            setProcessingState(false);
+                        } else {
+                            showMessage("❌ Failed to send OTP.", "error");
+                            paymentToggle.classList.remove("active");
+                            document.getElementById("lateFine").disabled = true;
+                            setProcessingState(false);
+                        }
+                    } catch (err) {
+                        console.error("OTP Error:", err);
+                        showMessage("❌ Error sending OTP.", "error");
+                        paymentToggle.classList.remove("active");
+                        document.getElementById("lateFine").disabled = true;
+                        setProcessingState(false);
+                    }
+                } else {
+                    try {
+                        const success = await window.pywebview.api.enabling_the_payment_function(paymentStatus);
+                        if (!success) {
+                            showMessage("❌ Failed to disable payment setting.", "error");
+                            paymentToggle.classList.add("active");
+                            document.getElementById("lateFine").disabled = false;
+                        }
+                    } catch (err) {
+                        console.error("Disable Error:", err);
+                        showMessage("❌ Error disabling setting.", "error");
+                        paymentToggle.classList.add("active");
+                        document.getElementById("lateFine").disabled = false;
+                    } finally {
+                        setProcessingState(false);
+                    }
+                }
+            });
+
+            // === Save Settings Handler ===
+            window.saveSettings = async function () {
+                if (isProcessing || !hasChanges) return;
+
+                books = parseInt(document.getElementById("numBooks").value.trim());
+                fine = parseFloat(document.getElementById("lateFine").value.trim());
+                period = parseInt(document.getElementById("borrowPeriod").value.trim());
+
+                setProcessingState(true, "Preparing to save settings...");
+
+                try {
+                    const isEnabled = !isNaN(fine) && fine > 0;
+
+                    if (
+                        isNaN(books) ||
+                        isNaN(period) ||
+                        (isEnabled && isNaN(fine))
+                    ) {
+                        showMessage("❌ All fields must be valid numbers.", "error");
+                        return;
+                    }
+
+                    const otpSent = await window.pywebview.api.stage_settings();
+                    if (otpSent) {
+                        isForPaymentToggle = false;
+                        settingsSection.classList.add("hidden");
+                        otpSection.classList.remove("hidden");
+                        setProcessingState(false);
+                    } else {
+                        showMessage("❌ Failed to send OTP.", "error");
+                        setProcessingState(false);
+                    }
+                } catch (error) {
+                    console.error("OTP Error:", error);
+                    showMessage("❌ OTP process failed.", "error");
+                    setProcessingState(false);
+                }
+            };
+
+            // === OTP Verification ===
+            window.verifyOTP = async function () {
+                if (isProcessing) return;
+
+                const otp = document.getElementById("otpInput").value.trim();
+                
+                if (!otp || otp.length !== 6) {
+                    showMessage("❌ Please enter a valid 6-digit OTP.", "error", "otp-status-msg");
+                    return;
+                }
+
+                setProcessingState(true, "Verifying OTP...");
+
+                try {
+                    if (isForPaymentToggle) {
+                        const result = await window.pywebview.api.enabling_the_payment_function(paymentStatus, otp);
+                        if (!result) {
+                            showMessage("❌ OTP verification failed.", "error", "otp-status-msg");
+                            paymentToggle.classList.remove("active");
+                            document.getElementById("lateFine").disabled = true;
+                        } else {
+                            showMessage("✅ Payment setting updated successfully.", "success");
+                        }
+                    } else {
+                        const result = await window.pywebview.api.verify_otp(otp, books, fine, period);
+                        if (result) {
+                            showMessage("✅ Settings saved successfully.", "success");
+                            // Reset the change tracking after successful save
+                            hasChanges = false;
+                        } else {
+                            showMessage("❌ Invalid or expired OTP.", "error", "otp-status-msg");
+                        }
+                    }
+
+                    // Always clear OTP and return to settings
+                    clearFields();
+                    settingsSection.classList.remove("hidden");
+                    otpSection.classList.add("hidden");
+                    
+                    // Refresh settings after successful verification
+                    setTimeout(() => fetchInitialSettings(), 1000);
+                } catch (err) {
+                    console.error("OTP Verification Error:", err);
+                    showMessage("❌ Error verifying OTP.", "error", "otp-status-msg");
+                    clearFields();
+                } finally {
+                    setProcessingState(false);
+                }
+            };
+
+            // === Resend OTP ===
+            window.resendOTP = function () {
+                if (isProcessing) return;
+
+                setProcessingState(true, "Resending OTP...");
+
+                const resendAPI = isForPaymentToggle
+                    ? () => window.pywebview.api.enabling_the_payment_function(paymentStatus)
+                    : window.pywebview.api.stage_settings_resend;
+
+                resendAPI()
+                    .then(success => {
+                        if (success) showMessage("✅ OTP resent successfully.", "success", "otp-status-msg");
+                        else showMessage("❌ Failed to resend OTP.", "error", "otp-status-msg");
+                    })
+                    .catch(err => {
+                        console.error("Resend OTP Error:", err);
+                        showMessage("❌ Could not resend OTP.", "error", "otp-status-msg");
+                    })
+                    .finally(() => {
+                        setProcessingState(false);
+                    });
+            };
+
+            // === Logout & Back Navigation ===
+            window.logout = function () {
+                if (isProcessing) return;
+                window.pywebview.api.logout();
+            };
+
+            window.goBack = function () {
+                if (isProcessing) return;
+                window.pywebview.api?.go_back();
+            };
+            
+            function clearFields() {
+                document.getElementById('otpInput').value = '';
+            }
+        });
+
+        // Updated restore function
+        async function restore() {
+            if (isProcessing) return;
+
+            setProcessingState(true, "Initiating backup...");
+
+            try {
+                console.log("Backup process started...");
+                
+                const res = await window.pywebview.api.initiate_backup();
+                console.log("API Response:", res);
+
+                if (res.check_internet === false) {
+                    alert("⚠️ No internet connection. Please check your network settings.");
+                    showMessage("❌ No internet connection.", "error");
+                } else if (res === true) {
+                    showMessage("✅ Backup downloaded successfully.", "success");
+                } else {
+                    showMessage("❌ Backup failed. Please try again.", "error");
+                }
+            } catch (error) {
+                console.error("API error:", error);
+                showMessage(`❌ Request failed: ${error.message || error}`, "error");
+            } finally {
+                setProcessingState(false);
+                console.log("Backup process finished.");
+            }
+        }
+
+        // Add enter key support for OTP
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !document.getElementById('otpSection').classList.contains('hidden') && !isProcessing) {
+                verifyOTP();
+            }
+        });
+    </script>
+</body>
+</html>

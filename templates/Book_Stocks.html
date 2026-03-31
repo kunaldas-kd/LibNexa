@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Book Stock List</title>
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%);
+      color: #2C3E50;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      animation: fadeIn 1.5s ease-in-out;
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      user-select: text;
+    }
+
+    h1 {
+      font-size: 42px;
+      margin-bottom: 30px;
+      text-align: center;
+      color: #2C3E50;
+      text-shadow: 0 2px 8px rgba(44, 62, 80, 0.2);
+      font-weight: 700;
+      letter-spacing: -1px;
+      animation: slideUp 1.2s ease-out;
+      background: linear-gradient(45deg, #2C3E50, #34495e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    #search-container {
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: flex-start;
+      width: 100%;
+      gap: 10px;
+      animation: fadeIn 1.8s ease-in-out;
+    }
+
+    #search-container1 {
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      gap: 10px;
+      animation: fadeIn 2s ease-in-out;
+    }
+
+    #search-input {
+      padding: 12px 16px;
+      font-size: 16px;
+      border-radius: 12px;
+      border: 2px solid rgba(44, 62, 80, 0.2);
+      width: 350px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
+      color: #2C3E50;
+    }
+
+    #search-input:focus {
+      outline: none;
+      border-color: #2C3E50;
+      box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.15), 0 4px 20px rgba(44, 62, 80, 0.2);
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    #search-input::placeholder {
+      color: rgba(44, 62, 80, 0.6);
+    }
+
+    #dashboard-btn,
+    #refresh-button,
+    #download-button {
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    #dashboard-btn{
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+    }
+
+    #dashboard-btn:hover,
+    #refresh-button:hover,
+    #download-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(44, 62, 80, 0.4);
+    }
+
+    #dashboard-btn:active,
+    #refresh-button:active,
+    #download-button:active {
+      transform: translateY(0px);
+    }
+
+    #download-button:disabled {
+      background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      max-height: 70vh;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(44, 62, 80, 0.15);
+      animation: popIn 1s ease-in-out;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(44, 62, 80, 0.1);
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 20px;
+      user-select: text;
+    }
+
+    th, td {
+      border: 1px solid rgba(44, 62, 80, 0.1);
+      padding: 12px 16px;
+      text-align: center;
+      color: #2C3E50;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      user-select: text;
+    }
+
+    th {
+      background: linear-gradient(135deg, #2C3E50, #34495e);
+      color: #FFFFFF;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      font-size: 16px;
+      font-weight: 600;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    tbody tr {
+      transition: all 0.3s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(44, 62, 80, 0.08);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.15);
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(248, 249, 250, 0.7);
+    }
+
+    #loading {
+      font-size: 16px;
+      margin-bottom: 15px;
+      display: block;
+      animation: fadeIn 1s ease-in-out;
+      color: #2C3E50;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 12px 20px;
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(44, 62, 80, 0.1);
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
+    }
+
+    .back-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #2C3E50;
+      border: none;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      animation: slideUp 1s ease-in-out;
+      padding: 10px 12px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
+      border: 1px solid rgba(44, 62, 80, 0.1);
+    }
+
+    .back-btn:hover {
+      transform: scale(1.1) translateY(-2px);
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 6px 20px rgba(44, 62, 80, 0.2);
+      color: #34495e;
+    }
+
+    #bottom-summary {
+      width: 100%;
+      margin-top: 15px;
+      font-weight: 600;
+      font-size: 16px;
+      color: #2C3E50;
+      padding: 0 20px;
+      animation: fadeIn 1s ease-in-out;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    
+
+    #total-books {
+      width: 100%;
+      text-align: right;
+      margin-top: 15px;
+      font-weight: 600;
+      font-size: 18px;
+      color: #2C3E50;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(44, 62, 80, 0.1);
+      animation: fadeIn 1s ease-in-out;
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
+    }
+
+    .status {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 14px;
+      min-height: 20px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(44, 62, 80, 0.1);
+    }
+
+    /* Dropdown styling */
+    #refresh-button, #download-button, #calendar-btn {
+      padding: 12px 14px;
+      font-size: 20px;
+      font-weight: 600;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 110%;
+      right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      min-width: 250px;
+      border-radius: 12px;
+      box-shadow: 0 15px 35px rgba(44, 62, 80, 0.2);
+      z-index: 10;
+      overflow: hidden;
+      border: 1px solid rgba(44, 62, 80, 0.2);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .dropdown-content button {
+      background: none;
+      color: #2C3E50;
+      padding: 12px 16px;
+      border: none;
+      text-align: left;
+      width: 100%;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .dropdown-content button:hover {
+      background: rgba(44, 62, 80, 0.1);
+      color: #2C3E50;
+      transform: translateX(5px);
+    }
+
+    .dropdown-content.show {
+      display: block;
+    }
+
+    /* Modal styling */
+    .filter-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(44, 62, 80, 0.6);
+      backdrop-filter: blur(8px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .filter-modal > div {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 250, 0.95));
+      backdrop-filter: blur(20px);
+      padding: 30px 40px;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(44, 62, 80, 0.3);
+      min-width: 350px;
+      text-align: center;
+      animation: popIn 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .filter-modal h3 {
+      margin-bottom: 20px;
+      color: #2C3E50;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .filter-modal input, .filter-modal select {
+      padding: 12px 16px;
+      margin: 15px 0;
+      font-size: 14px;
+      border: 2px solid rgba(44, 62, 80, 0.3);
+      border-radius: 8px;
+      width: 85%;
+      background: rgba(255, 255, 255, 0.9);
+      transition: all 0.3s ease;
+      color: #2C3E50;
+    }
+
+    .filter-modal input:focus, .filter-modal select:focus {
+      outline: none;
+      border-color: #2C3E50;
+      box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.2);
+    }
+
+    .filter-modal button {
+      padding: 12px 24px;
+      margin: 15px 8px 0 8px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+      min-width: 100px;
+      transition: all 0.3s ease;
+    }
+
+    .filter-modal button:first-of-type {
+      background: linear-gradient(135deg, #2C3E50, #34495e);
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.3);
+    }
+
+    .filter-modal button:first-of-type:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(44, 62, 80, 0.4);
+      background: linear-gradient(135deg, #34495e, #2C3E50);
+    }
+
+    .filter-modal button:last-of-type {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+    }
+
+    .filter-modal button:last-of-type:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+    }
+
+    /* Submit button styling */
+    .submitbtn {
+      background: linear-gradient(135deg, #9b59b6, #8e44ad);
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 10px rgba(44, 62, 80, 0.3);
+    }
+
+    .submitbtn:hover {
+      background: linear-gradient(135deg, #8e44ad, #7d3c98);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(44, 62, 80, 0.4);
+    }
+
+    .submitbtn:active {
+      transform: translateY(0px);
+    }
+
+    .disabled-btn {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <button class="back-btn" onclick="goBack()">←</button>
+  <h1>Book Inventory</h1>
+  <div id="loading">Loading Book Inventory data...</div>
+  <div id="status-msg" class="status"></div>
+  <div id="search-container">
+    <input type="text" id="search-input" placeholder="Search by any field..." />
+    <button id="refresh-button" onclick="fetchBookStock()" title="Refresh">🔄️</button>
+    <!-- Dropdown Button -->
+    <div class="dropdown">
+      <button id="download-button" onclick="toggleDropdown()" title="Download">⬇️</button>
+      <div id="loader" style="display:none;">⏳</div>
+      <div class="dropdown-content" id="dropdown-menu">
+        <button onclick="downloadAll()">Download All</button>
+        <hr>
+        <button onclick="openFilterModal('BookName-modal')">By Book Name</button>
+        <button onclick="openFilterModal('Author-modal')">By Author</button>
+        <button onclick="openFilterModal('Publisher-modal')">By Publisher</button>
+        <button onclick="openFilterModal('Place-modal')">By Place of Publication</button>
+        <button onclick="openFilterModal('Source-modal')">By Source</button>
+        <button onclick="openFilterModal('StockDate-modal')">By Stock Date</button>
+        <button onclick="openFilterModal('PublishedYear-modal')">By Published Year</button>
+        <button onclick="openFilterModal('OrderInfo-modal')">By Order/Challan/Bill Info</button>
+      </div>
+    </div>
+    <div id="search-container1">
+      <button id="dashboard-btn" onclick="addBookStock()">+ Add Book Inventory</button>
+    </div>
+  </div>
+
+  
+  <div class="table-container">
+    <table id="book-table">
+      <thead>
+        <tr>
+          <th>SL No</th>
+          <th>Book Name</th>
+          <th>Author</th>
+          <th>Edition</th>
+          <th>Publisher</th>
+          <th>Place of Publication</th>
+          <th>Published Year</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          <th>Order Info</th>
+          <th>Source</th>
+          <th>Stock Date</th>
+          <th>Stock Time</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Data will be populated by JavaScript -->
+      </tbody>
+    </table>
+  </div>
+
+  <div id="bottom-summary">
+    
+    <div class="right-summary">
+      <span id="total-books">📚 Total Books: 0</span>
+    </div>
+  </div>
+
+  <!-- Filter Modals (8 total) -->
+  <div id="BookName-modal" class="filter-modal">
+    <div>
+      <h3>Filter by Book Name</h3>
+      <input type="text" id="filter-book" placeholder="Enter Book Name">
+      <button onclick="confirmFilterDownload('Book_Name')">Download</button>
+      <button onclick="closeFilterModal('BookName-modal')">Cancel</button>
+    </div>
+  </div>
+
+  <div id="Author-modal" class="filter-modal">
+    <div>
+      <h3>Filter by Author</h3>
+      <input type="text" id="filter-author" placeholder="Enter Author">
+      <button onclick="confirmFilterDownload('Author')">Download</button>
+      <button onclick="closeFilterModal('Author-modal')">Cancel</button>
+    </div>
+  </div>
+
+  <div id="Publisher-modal" class="filter-modal">
+    <div>
+      <h3>Filter by Publisher</h3>
+      <input type="text" id="filter-publisher" placeholder="Enter Publisher">
+      <button onclick="confirmFilterDownload('Publisher')">Download</button>
+      <button onclick="closeFilterModal('Publisher-modal')">Cancel</button>
+    </div>
+  </div>
+
+  <div id="Place-modal" class="filter-modal">
+    <div>
+      <h3>Filter by Place of Publication</h3>
+      <input type="text" id="filter-place" placeholder="Enter Place of Publication">
+      <button onclick="confirmFilterDownload('Place_of_Publication')">Download</button>
+      <button onclick="closeFilterModal('Place-modal')">Cancel</button>
+    </div>
+  </div>
+
+  <div id="Source-modal" class="filter-modal">
+    <div>
+      <h3>Filter by Source</h3>
+      <input type="text" id="filter-source" placeholder="Enter Source">
+      <button onclick="confirmFilterDownload('Source')">Download</button>
+      <button onclick="closeFilterModal('Source-modal')">Cancel</button>
+    </div>
+  </div>
+
+  <div id="StockDate-modal" class="filter-modal">
+    <div>
+      <h3>Filter by Stock Date</h3>
+      <input type="date" id="filter-stockdate">
+      <button onclick="confirmFilterDownload('Stock_Date')">Download</button>
+      <button onclick="closeFilterModal('StockDate-modal')">Cancel</button>
+    </div>
+  </div>
+
+  <div id="PublishedYear-modal" class="filter-modal">
+    <div>
+      <h3>Filter by Published Year</h3>
+      <input type="number" id="filter-year" placeholder="Enter Published Year">
+      <button onclick="confirmFilterDownload('Published_Year')">Download</button>
+      <button onclick="closeFilterModal('PublishedYear-modal')">Cancel</button>
+    </div>
+  </div>
+
+  <div id="OrderInfo-modal" class="filter-modal">
+    <div>
+      <h3>Filter by Order / Challan / Bill Info</h3>
+      <input type="text" id="filter-order" placeholder="Enter Info">
+      <button onclick="confirmFilterDownload('Order_Challan_Bill_Info')">Download</button>
+      <button onclick="closeFilterModal('OrderInfo-modal')">Cancel</button>
+    </div>
+  </div>
+
+    <script>
+  let allBookStock = [];
+  let firstLoadComplete = false;
+  let stockInterval;
+
+  allBookStock = [];
+
+  function showMessage(message, color = "green") {
+    const msgBox = document.getElementById("status-msg");
+    msgBox.textContent = message;
+    msgBox.style.color = color;
+    setTimeout(() => {
+      msgBox.textContent = "";
+    }, 5000);
+  }
+
+  function toggleDropdown() {
+    const dropdown = document.getElementById("dropdown-menu");
+    dropdown.classList.toggle("show");
+  }
+
+  window.onclick = function (event) {
+    if (!event.target.matches('#download-button')) {
+      const dropdowns = document.getElementsByClassName("dropdown-content");
+      for (let i = 0; i < dropdowns.length; i++) {
+        const openDropdown = dropdowns[i];
+        if (openDropdown.classList.contains('show')) {
+          openDropdown.classList.remove('show');
+        }
+      }
+    }
+  }
+
+  async function fetchBookStock() {
+    const loadingText = document.getElementById("loading");
+
+    if (!firstLoadComplete) {
+      loadingText.style.display = "block";
+      loadingText.textContent = "Loading stock data...";
+    }
+
+    try {
+      if (window.pywebview?.api) {
+        const booksStock = await window.pywebview.api.fetchbookstock();
+        if (JSON.stringify(booksStock) !== JSON.stringify(allBookStock)) {
+          allBookStock = booksStock;
+          renderStockTable(booksStock);
+          await updateTotalBooks();
+        }
+      } else {
+        renderStockTable([]);
+        updateTotalBooks();
+      }
+
+      if (!firstLoadComplete) {
+        loadingText.style.display = "none";
+        firstLoadComplete = true;
+        if (window.pywebview?.api) {
+          stockInterval = setInterval(fetchBookStock, 10000);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching stock:", error);
+      showMessage("⚠️ Error loading data", "red");
+      renderStockTable([]);
+      updateTotalBooks();
+      loadingText.style.display = "none";
+    }
+  }
+
+  function renderStockTable(stockData) {
+    const table = document.getElementById("book-table");
+    const tbody = table.querySelector('tbody');
+    tbody.innerHTML = '';
+
+    stockData.forEach(book => {
+      const row = tbody.insertRow();
+      row.innerHTML = `
+        <td>${book.SL_No}</td>
+        <td>${book.Book_Name}</td>
+        <td>${book.Author}</td>
+        <td>${book.Edition}</td>
+        <td>${book.Publisher}</td>
+        <td>${book.Place_of_Publication}</td>
+        <td>${book.Published_Year}</td>
+        <td>${book.QTY}</td>
+        <td>${book.Book_Price}</td>
+        <td>${book.Order_Challan_Bill_Info}</td>
+        <td>${book.Source}</td>
+        <td>${book.Stock_Date}</td>
+        <td>${book.Stock_Time}</td>
+        <td>
+          ${book.Is_BookID_Assigned !== "YES"
+          ? `<button class="submitbtn" onclick="assignBookId('${book.Book_Name}', '${book.Author}')">Assign ID</button>`
+          : "<span style='color: green; font-weight: bold;'>✅ Assigned</span>"
+        }
+        </td>
+      `;
+    });
+  }
+
+  async function updateTotalBooks() {
+    try {
+      if (window.pywebview?.api) {
+        const totalQty = await window.pywebview.api.total_books();
+        document.getElementById("total-books").textContent = `📚 Total Books: ${totalQty}`;
+      } else {
+        const totalQty = allBookStock.reduce((sum, book) => sum + parseInt(book.QTY || 0), 0);
+        document.getElementById("total-books").textContent = `📚 Total Books: ${totalQty}`;
+      }
+    } catch (error) {
+      document.getElementById("total-books").textContent = "📚 Total Books: ❌";
+    }
+  }
+
+  function autoFilterStock() {
+    const searchValue = document.getElementById("search-input").value.toLowerCase();
+    const filtered = allBookStock.filter(book =>
+      Object.values(book).some(value =>
+        String(value).toLowerCase().includes(searchValue)
+      )
+    );
+    renderStockTable(filtered);
+  }
+
+  function goBack() {
+    if (window.pywebview?.api) {
+      window.pywebview.api.go_back();
+    } else {
+      showMessage("⚠️ Back functionality requires backend connection.", "orange");
+    }
+  }
+
+  function addBookStock() {
+    if (window.pywebview?.api) {
+      window.pywebview.api.add_book_stock();
+    } else {
+      showMessage("⚠️ Add book functionality requires backend connection.", "orange");
+    }
+  }
+
+  async function assignBookId(bookName, author) {
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+
+    const allButtons = document.querySelectorAll(".submitbtn");
+    allButtons.forEach(button => {
+      button.disabled = true;
+      if (button !== btn) button.classList.add("disabled-btn");
+    });
+
+    btn.innerHTML = "⏳";
+
+    const bookDetails = { bookName, author };
+
+    try {
+      if (window.pywebview?.api) {
+        const response = await window.pywebview.api.Id_Assign(bookDetails);
+        if (response === true) {
+          showMessage(`✅ ID automatically assigned to "${bookDetails.bookName}"`, "green");
+          await fetchBookStock();
+        } else {
+          showMessage("⚠️ ID assignment failed.", "red");
+        }
+      } else {
+        const bookIndex = allBookStock.findIndex(book =>
+          book.Book_Name === bookDetails.bookName && book.Author === bookDetails.author
+        );
+        if (bookIndex !== -1) {
+          allBookStock[bookIndex].Is_BookID_Assigned = "YES";
+          renderStockTable(allBookStock);
+          showMessage(`✅ ID automatically assigned to "${bookDetails.bookName}"`, "green");
+        }
+      }
+    } catch (error) {
+      console.error("Error during ID assignment:", error);
+      showMessage("⚠️ Something went wrong during ID assignment.", "red");
+    } finally {
+      allButtons.forEach(button => {
+        button.disabled = false;
+        button.classList.remove("disabled-btn");
+      });
+      btn.innerHTML = originalText;
+    }
+  }
+
+  function openFilterModal(modalId) {
+    document.getElementById(modalId).style.display = "flex";
+    const modal = document.getElementById(modalId);
+    const input = modal.querySelector('input');
+    if (input) setTimeout(() => input.focus(), 100);
+  }
+
+  function closeFilterModal(modalId) {
+    document.getElementById(modalId).style.display = "none";
+    const modal = document.getElementById(modalId);
+    const input = modal.querySelector('input');
+    if (input) input.value = '';
+  }
+
+  async function downloadAll() {
+    const downloadBtn = document.getElementById("download-button");
+  const originalIcon = downloadBtn.innerHTML;
+
+  downloadBtn.innerHTML = "⏳";      // Replace icon with loader
+  downloadBtn.disabled = true;      // Disable button
+
+  try {
+    await window.pywebview.api.download();
+    showMessage("✅ Downloading all books...", "green");
+  } catch (error) {
+    showMessage("⚠️ Download failed.", "red");
+  } finally {
+    downloadBtn.innerHTML = originalIcon;  // Restore original icon
+    downloadBtn.disabled = false;          // Re-enable button
+  }
+}
+ 
+
+async function confirmFilterDownload(filterType) {
+  const modalMap = {
+    'Book_Name': 'filter-book',
+    'Author': 'filter-author',
+    'Publisher': 'filter-publisher',
+    'Place_of_Publication': 'filter-place',
+    'Source': 'filter-source',
+    'Stock_Date': 'filter-stockdate',
+    'Published_Year': 'filter-year',
+    'Order_Challan_Bill_Info': 'filter-order'
+  };
+
+  const inputId = modalMap[filterType];
+  const filterValue = document.getElementById(inputId).value.trim();
+
+  if (!filterValue) {
+    showMessage("⚠️ Please enter a filter value!", "orange");
+    return;
+  }
+
+  // Build arguments with only the selected filter
+  const args = {
+    Book_Name: null,
+    Author: null,
+    Publisher: null,
+    Place_of_Publication: null,
+    Source: null,
+    Stock_Date: null,
+    Published_Year: null,
+    Order_Challan_Bill_Info: null
+  };
+
+  args[filterType] = filterValue;
+
+  try {
+    const res = await window.pywebview.api.download(
+      args.Book_Name,
+      args.Author,
+      args.Publisher,
+      args.Place_of_Publication,
+      args.Source,
+      args.Stock_Date,
+      args.Published_Year,
+      args.Order_Challan_Bill_Info
+    );
+    if(res === true){
+    showMessage(`✅ Downloading books filtered by ${filterType}...`, "green");
+    }
+    else{`❌ Download Faild`}
+    // Close and reset all modals
+    const modals = document.querySelectorAll('.filter-modal');
+    modals.forEach(modal => {
+      if (modal.style.display === 'flex') {
+        modal.style.display = 'none';
+        const input = modal.querySelector('input');
+        if (input) input.value = '';
+      }
+    });
+  } catch (error) {
+    showMessage("⚠️ Filtered download failed.", "red");
+  }
+}
+
+
+  window.addEventListener("beforeunload", () => {
+    if (stockInterval) clearInterval(stockInterval);
+  });
+
+  document.getElementById("search-input").addEventListener("input", autoFilterStock);
+
+  document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById("loading").style.display = "none";
+    setInterval(fetchBookStock, 1000);
+  });
+</script>
+</body>
+</html>

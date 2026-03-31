@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💸 Debit Entry</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #f1f5f9;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --surface: rgba(255, 255, 255, 0.9);
+            --border: rgba(148, 163, 184, 0.2);
+            --shadow: rgba(0, 0, 0, 0.1);
+            --shadow-lg: rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #2C3E50 0%, #34495E 35%, #3498DB 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+            padding: 20px 0;
+        }
+
+        /* Animated background elements */
+        .bg-decoration {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .bg-decoration::before,
+        .bg-decoration::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .bg-decoration::before {
+            width: 400px;
+            height: 400px;
+            top: -200px;
+            right: -200px;
+            animation-delay: -3s;
+        }
+
+        .bg-decoration::after {
+            width: 300px;
+            height: 300px;
+            bottom: -150px;
+            left: -150px;
+            animation-delay: -6s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(180deg); }
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-primary);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            box-shadow: 0 4px 6px -1px var(--shadow);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 10px 25px -3px var(--shadow-lg);
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .form-container {
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            padding: 48px 40px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 25px 50px -12px var(--shadow-lg);
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .status {
+            margin-bottom: 24px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 14px;
+            min-height: 20px;
+            padding: 12px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .status.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .status.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .status.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .status:empty {
+            display: none;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            margin-left: 4px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 18px;
+            z-index: 2;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 16px 16px 16px 52px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 400;
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            transform: translateY(-1px);
+        }
+
+        input::placeholder {
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Custom validation styles */
+        .form-group.error input,
+        .form-group.error select {
+            border-color: var(--error);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .form-group.success input,
+        .form-group.success select {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .error-message {
+            color: var(--error);
+            font-size: 12px;
+            margin-top: 4px;
+            margin-left: 16px;
+            display: none;
+        }
+
+        .form-group.error .error-message {
+            display: block;
+        }
+
+        .button-group {
+            display: flex;
+            margin-top: 32px;
+        }
+
+        .submit-btn {
+            flex: 1;
+            padding: 18px;
+            border-radius: 12px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            box-shadow: 0 4px 14px 0 rgba(231, 76, 60, 0.4);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px 0 rgba(231, 76, 60, 0.5);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 14px 0 rgba(231, 76, 60, 0.2);
+        }
+
+        .submit-btn::before{
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .submit-btn:hover:not(:disabled)::before {
+            left: 100%;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .submit-btn.loading .loading-spinner {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .form-container {
+                margin: 10px;
+                padding: 32px 24px;
+                max-width: none;
+            }
+
+            .header-title {
+                font-size: 24px;
+            }
+
+            .back-btn {
+                top: 16px;
+                left: 16px;
+            }
+
+            input[type="text"],
+            input[type="number"],
+            select {
+                padding: 14px 14px 14px 48px;
+                font-size: 16px;
+            }
+
+            .input-icon {
+                left: 14px;
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .form-container {
+                margin: 5px;
+                padding: 24px 16px;
+            }
+
+            .form-grid {
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-decoration"></div>
+    
+    <button class="back-btn" onclick="goBack()" aria-label="Go back">
+        ←
+    </button>
+
+    <div class="form-container">
+        <div class="header-section">
+            <h1 class="header-title">💸 Cash Withdrawal</h1>
+            <p class="subtitle">Process debit entry for member transactions</p>
+        </div>
+
+        <div id="status-msg" class="status"></div>
+
+        <form id="debitForm" novalidate>
+            <div class="form-grid">
+                <div class="form-group" id="memberType-group">
+                    <label for="memberType">Member Type</label>
+                    <div class="input-wrapper">
+                        <div class="input-icon">👤</div>
+                        <select id="memberType" required>
+                            <option value="">-- Select Member Type --</option>
+                            <option value="Principal">Principal</option>
+                            <option value="Librarian">Librarian</option>
+                            <option value="Teacher">Teacher</option>
+                            <option value="Staff">Staff</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="error-message">Please select a member type</div>
+                </div>
+
+                <div class="form-group" id="memberName-group">
+                    <label for="memberName">Member Name</label>
+                    <div class="input-wrapper">
+                        <div class="input-icon">📝</div>
+                        <input type="text" id="memberName" placeholder="Enter Member Name" required>
+                    </div>
+                    <div class="error-message">Member name is required</div>
+                </div>
+
+                <div class="form-group" id="amount-group">
+                    <label for="amount">Amount</label>
+                    <div class="input-wrapper">
+                        <div class="input-icon">💰</div>
+                        <input type="number" id="amount" placeholder="Enter Amount" min="0.01" step="0.01" required>
+                    </div>
+                    <div class="error-message">Valid amount is required</div>
+                </div>
+
+                <div class="form-group" id="reason-group">
+                    <label for="reason">Reason</label>
+                    <div class="input-wrapper">
+                        <div class="input-icon">📋</div>
+                        <input type="text" id="reason" placeholder="Enter Reason for Debit" required>
+                    </div>
+                    <div class="error-message">Reason is required</div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <div class="loading-spinner"></div>
+                    <span class="btn-text">💸 Process Withdrawal</span>
+                </button>
+            </div>
+        </form>
+    </div>
+
+  <script>
+  function showMessage(message, color = "green") {
+    const msgBox = document.getElementById("status-msg");
+    msgBox.textContent = message;
+    msgBox.style.color = color;
+    setTimeout(() => {
+      msgBox.textContent = "";
+    }, 5000);
+  }
+
+  async function submitDebit() {
+    const type = document.getElementById("memberType").value.trim();
+    const name = document.getElementById("memberName").value.trim();
+    const amount = document.getElementById("amount").value.trim();
+    const reason = document.getElementById("reason").value.trim();
+    const btn = document.getElementById("submitBtn");
+    const btnText = btn.querySelector(".btn-text");
+    const spinner = btn.querySelector(".loading-spinner");
+
+    if (!type || !name || !amount || !reason) {
+      showMessage("⚠ Please fill all fields.", "orange");
+      return;
+    }
+
+    btn.disabled = true;
+    btn.classList.add("loading");
+    btnText.textContent = "Processing...";
+    spinner.style.display = "block";
+
+    try {
+      const response = await window.pywebview.api.debit_amount(type, name, amount, reason);
+      if (response === true) {
+        showMessage("✅ Debit transaction successful.", "green");
+        clearForm();
+      } else {
+        showMessage("❌ Debit transaction failed.", "red");
+      }
+    } catch (error) {
+      console.error("Error during debit:", error);
+      showMessage("❌ An error occurred while processing the debit.", "red");
+    } finally {
+      btn.disabled = false;
+      btn.classList.remove("loading");
+      btnText.textContent = "💸 Process Withdrawal";
+      spinner.style.display = "none";
+    }
+  }
+
+  function clearForm() {
+    ["memberType", "memberName", "amount", "reason"].forEach(id => {
+      const field = document.getElementById(id);
+      if (field) field.value = "";
+    });
+  }
+
+  function goBack() {
+    if (window.pywebview?.api?.go_back) {
+      window.pywebview.api.go_back();
+    } else {
+      showMessage("❌ Internal error: Unable to go back.", "red");
+    }
+  }
+
+  // ✅ Prevent default form reload
+  document.getElementById("debitForm").addEventListener("submit", function (event) {
+    event.preventDefault();
+    submitDebit();
+  });
+</script>
+
+</body>
+</html>

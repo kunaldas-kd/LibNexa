@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teacher List</title>
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%);
+      color: #2C3E50;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      animation: fadeIn 1.5s ease-in-out;
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      user-select: text;
+    }
+
+    h1 {
+      font-size: 42px;
+      margin-bottom: 30px;
+      text-align: center;
+      color: #2C3E50;
+      text-shadow: 0 2px 8px rgba(44, 62, 80, 0.2);
+      font-weight: 700;
+      letter-spacing: -1px;
+      animation: slideUp 1.2s ease-out;
+      background: linear-gradient(45deg, #2C3E50, #34495e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    #search-container {
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: flex-start;
+      width: 100%;
+      gap: 10px;
+      animation: fadeIn 1.8s ease-in-out;
+    }
+
+    #search-container1 {
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      gap: 10px;
+      animation: fadeIn 2s ease-in-out;
+    }
+
+    #search-input {
+      padding: 12px 16px;
+      font-size: 16px;
+      border-radius: 12px;
+      border: 2px solid rgba(44, 62, 80, 0.2);
+      width: 350px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
+      color: #2C3E50;
+    }
+
+    #search-input:focus {
+      outline: none;
+      border-color: #2C3E50;
+      box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.15), 0 4px 20px rgba(44, 62, 80, 0.2);
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    #search-input::placeholder {
+      color: rgba(44, 62, 80, 0.6);
+    }
+
+    #dashboard-btn1,
+    #dashboard-btn,
+    #refresh-button,
+    #download-button {
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    #dashboard-btn { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+    #dashboard-btn1 { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+
+    #dashboard-btn:hover,
+    #dashboard-btn1:hover,
+    #refresh-button:hover,
+    #download-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(44, 62, 80, 0.4);
+    }
+
+    #dashboard-btn:active,
+    #dashboard-btn1:active,
+    #refresh-button:active,
+    #download-button:active {
+      transform: translateY(0px);
+    }
+
+    #download-button:disabled,
+    #refresh-button:disabled,
+    #dashboard-btn:disabled {
+      background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+      cursor: not-allowed;
+      opacity: 0.6;
+      transform: none !important;
+      box-shadow: 0 2px 8px rgba(44, 62, 80, 0.2);
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      max-height: 70vh;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(44, 62, 80, 0.15);
+      animation: popIn 1s ease-in-out;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(44, 62, 80, 0.1);
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      user-select: text;
+    }
+
+    th, td {
+      border: 1px solid rgba(44, 62, 80, 0.1);
+      padding: 12px 16px;
+      text-align: center;
+      color: #2C3E50;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      user-select: text;
+    }
+
+    th {
+      background: linear-gradient(135deg, #2C3E50, #34495e);
+      color: #FFFFFF;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      font-size: 16px;
+      font-weight: 600;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    tbody tr {
+      transition: all 0.3s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(44, 62, 80, 0.08);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.15);
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(248, 249, 250, 0.7);
+    }
+
+    #loading {
+      font-size: 16px;
+      margin-bottom: 15px;
+      display: block;
+      animation: fadeIn 1s ease-in-out;
+      color: #2C3E50;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 12px 20px;
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(44, 62, 80, 0.1);
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
+    }
+
+    .back-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #2C3E50;
+      border: none;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      animation: slideUp 1s ease-in-out;
+      padding: 10px 12px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
+      border: 1px solid rgba(44, 62, 80, 0.1);
+    }
+
+    .back-btn:hover {
+      transform: scale(1.1) translateY(-2px);
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 6px 20px rgba(44, 62, 80, 0.2);
+      color: #34495e;
+    }
+
+    .back-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    #total-teachers {
+      width: 100%;
+      text-align: right;
+      margin-top: 15px;
+      font-weight: 600;
+      font-size: 18px;
+      color: #2C3E50;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(44, 62, 80, 0.1);
+      animation: fadeIn 1s ease-in-out;
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
+    }
+
+    .status {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 14px;
+      min-height: 20px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(44, 62, 80, 0.1);
+    }
+
+    .library-clearance-btn {
+      padding: 6px 10px;
+      background-color: #a80000;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    .library-clearance-btn:disabled {
+      background: #95a5a6;
+      cursor: not-allowed;
+      opacity: 0.6;
+      transform: none !important;
+    }
+
+    /* Modal styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(44, 62, 80, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: #fff;
+      padding: 25px 20px;
+      border-radius: 10px;
+      width: 350px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(44, 62, 80, 0.2);
+      animation: popIn 0.3s ease-out;
+    }
+
+    .modal-content h2 {
+      margin-bottom: 10px;
+      font-size: 20px;
+      color: #2C3E50;
+    }
+
+    .modal-content p {
+      font-size: 16px;
+      margin-bottom: 20px;
+      color: #2C3E50;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .confirm-btn, .cancel-btn {
+      padding: 8px 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .confirm-btn {
+      background-color: #258400;
+      color: #fff;
+    }
+
+    .cancel-btn {
+      background-color: #a80000;
+      color: #fff;
+    }
+
+    .confirm-btn:disabled,
+    .cancel-btn:disabled {
+      background: #95a5a6;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    /* Dropdown styling */
+    #refresh-button, #download-button, #calendar-btn {
+      padding: 12px 14px;
+      font-size: 20px;
+      font-weight: 600;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 110%;
+      right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      min-width: 250px;
+      border-radius: 12px;
+      box-shadow: 0 15px 35px rgba(44, 62, 80, 0.2);
+      z-index: 10;
+      overflow: hidden;
+      border: 1px solid rgba(44, 62, 80, 0.2);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .dropdown-content button {
+      background: none;
+      color: #2C3E50;
+      padding: 12px 16px;
+      border: none;
+      text-align: left;
+      width: 100%;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .dropdown-content button:hover {
+      background: rgba(44, 62, 80, 0.1);
+      color: #2C3E50;
+      transform: translateX(5px);
+    }
+
+    .dropdown-content button:disabled {
+      background: rgba(149, 165, 166, 0.3);
+      color: #95a5a6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .dropdown-content.show {
+      display: block;
+    }
+
+    /* Modal styling */
+    .filter-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(50, 80, 44, 0.6);
+      backdrop-filter: blur(8px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .filter-modal > div {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 250, 0.95));
+      backdrop-filter: blur(20px);
+      padding: 30px 40px;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(44, 62, 80, 0.3);
+      min-width: 350px;
+      text-align: center;
+      animation: popIn 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .filter-modal h3 {
+      margin-bottom: 20px;
+      color: #2C3E50;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .filter-modal input, .filter-modal select {
+      padding: 12px 16px;
+      margin: 15px 0;
+      font-size: 14px;
+      border: 2px solid rgba(44, 62, 80, 0.3);
+      border-radius: 8px;
+      width: 85%;
+      background: rgba(255, 255, 255, 0.9);
+      transition: all 0.3s ease;
+      color: #2C3E50;
+    }
+
+    .filter-modal input:focus, .filter-modal select:focus {
+      outline: none;
+      border-color: #2C3E50;
+      box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.2);
+    }
+
+    .filter-modal button {
+      padding: 12px 24px;
+      margin: 15px 8px 0 8px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+      min-width: 100px;
+      transition: all 0.3s ease;
+    }
+
+    .filter-modal button:first-of-type {
+      background: linear-gradient(135deg, #098b14, #0bb63f);
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.3);
+    }
+
+    .filter-modal button:first-of-type:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(44, 62, 80, 0.4);
+    }
+
+    .filter-modal button:last-of-type {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+    }
+
+    .filter-modal button:last-of-type:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+    }
+
+    .filter-modal button:disabled {
+      background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+      cursor: not-allowed;
+      opacity: 0.6;
+      transform: none !important;
+    }
+
+    /* Submit button styling */
+    .submitbtn {
+      background: linear-gradient(135deg, #9b59b6, #8e44ad);
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 10px rgba(44, 62, 80, 0.3);
+    }
+
+    .submitbtn:hover {
+      background: linear-gradient(135deg, #8e44ad, #7d3c98);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(44, 62, 80, 0.4);
+    }
+
+    .submitbtn:active {
+      transform: translateY(0px);
+    }
+
+    .submitbtn:disabled {
+      background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+      cursor: not-allowed;
+      opacity: 0.6;
+      transform: none !important;
+    }
+
+    /* Edit button styling */
+    .edit-btn {
+      padding: 6px 10px;
+      background: linear-gradient(135deg, #3498db, #2980b9);
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-right: 5px;
+    }
+
+    .edit-btn:hover {
+      background: linear-gradient(135deg, #2980b9, #21618c);
+      transform: translateY(-1px);
+    }
+
+    .edit-btn:disabled {
+      background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+      cursor: not-allowed;
+      opacity: 0.6;
+      transform: none !important;
+    }
+
+    .save-btn,
+    .cancel-edit-btn {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 16px;
+      margin-right: 5px;
+    }
+
+    /* Save Button */
+    .save-btn {
+      background: linear-gradient(135deg, #27ae60, #229954);
+    }
+
+    .save-btn:hover {
+      background: linear-gradient(135deg, #229954, #1e8449);
+      transform: translateY(-1px);
+    }
+
+    .save-btn:disabled {
+      background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+      cursor: not-allowed;
+      opacity: 0.6;
+      transform: none !important;
+    }
+
+    /* Cancel Button */
+    .cancel-edit-btn {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+    }
+
+    .cancel-edit-btn:hover {
+      background: linear-gradient(135deg, #c0392b, #a93226);
+      transform: translateY(-1px);
+    }
+
+    .cancel-edit-btn:disabled {
+      background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+      cursor: not-allowed;
+      opacity: 0.6;
+      transform: none !important;
+    }
+
+    /* Editable input styling */
+    .editable-input {
+      border: 2px solid #3498db;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 14px;
+      color: #2C3E50;
+      width: 100%;
+      box-shadow: 0 2px 8px rgba(52, 152, 219, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .editable-input:focus {
+      outline: none;
+      border-color: #2980b9;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+
+    /* Special styling for Teacher ID input */
+    .editable-input[data-field="Teacher_ID"] {
+      border-color: #f39c12;
+      background: rgba(243, 156, 18, 0.1);
+    }
+
+    .editable-input[data-field="Teacher_ID"]:focus {
+      border-color: #e67e22;
+      box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.2);
+    }
+
+    /* Non-editable field styling */
+    .non-editable-field {
+      background: rgba(149, 165, 166, 0.2);
+      color: #7f8c8d;
+      border: 2px solid #bdc3c7;
+      font-weight: 600;
+      text-align: center;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    /* Warning message for Teacher ID editing */
+    .edit-warning {
+      background: rgba(243, 156, 18, 0.1);
+      border: 1px solid #f39c12;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 10px 0;
+      color: #e67e22;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    /* Processing state overlay */
+    .processing-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(44, 62, 80, 0.3);
+      backdrop-filter: blur(2px);
+      z-index: 999;
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .processing-message {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 20px;
+      border-radius: 12px;
+      color: #2C3E50;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(44, 62, 80, 0.3);
+      animation: popIn 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <button class="back-btn" onclick="goBack()">←</button>
+  <h1>Teacher Directory</h1>
+  <div id="loading"></div>
+  <div id="status-msg" class="status"></div>
+  
+  <!-- Processing Overlay -->
+  <div id="processing-overlay" class="processing-overlay">
+    <div class="processing-message">
+      <div id="processing-text">Processing...</div>
+    </div>
+  </div>
+
+  <div id="search-container">
+    <input type="text" id="search-input" placeholder="Search by any field..." />
+    <button id="refresh-button" onclick="fetchTeachers()" title="Refresh">🔄️</button>
+    <div class="dropdown">
+      <button id="download-button" title="Download">⬇️</button>
+      <div class="dropdown-content">
+        <button onclick="downloadAll()">Download All</button><hr>
+        <button onclick="openFilterModal('Department-modal')">By Department</button>
+        <button onclick="openFilterModal('Designation-modal')">By Designation</button>
+        <button onclick="openFilterModal('Joining_Year-modal')">By Joining Year</button>
+        <button onclick="openFilterModal('Employment_Status-modal')">By Employment Status</button>
+      </div>
+    </div>
+
+    <div id="search-container1">
+      <button id="dashboard-btn" onclick="openTeacherEntry()">+ Add Teacher</button>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table id="teacher-table">
+      <thead>
+        <tr>
+          <th>Teacher ID</th>
+          <th>Teacher Name</th>
+          <th>Designation</th>
+          <th>Department</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Address</th>
+          <th>Joining Year</th>
+          <th>Status</th>
+          <th>Library Clearance</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+    </table>
+  </div>
+
+  <div id="total-teachers">👩‍🏫 Total Teachers: 0</div>
+  
+  <!-- Custom Confirmation Modal -->
+  <div id="confirmation-modal" style="display:none;" class="modal-overlay">
+    <div class="modal-content">
+      <h2>Confirm Clearance</h2>
+      <p id="confirmation-text">Are you sure you want to clear this teacher?</p>
+      <div class="modal-buttons">
+        <button id="confirm-clearance" class="confirm-btn">Yes</button>
+        <button id="cancel-clearance" class="cancel-btn">No</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Confirmation Modal -->
+  <div id="edit-confirmation-modal" style="display:none;" class="modal-overlay">
+    <div class="modal-content">
+      <h2>Confirm Edit</h2>
+      <p id="edit-confirmation-text">Are you sure you want to edit this teacher's information?</p>
+      <div class="edit-warning">
+        ⚠️ <strong>Warning:</strong> You can edit the Teacher ID, but be very careful as this is a unique identifier. Changing it may affect system references.
+      </div>
+      <div class="modal-buttons">
+        <button id="confirm-edit" class="confirm-btn">Yes, Edit</button>
+        <button id="cancel-edit" class="cancel-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Modals for Teachers -->
+  <div id="Department-modal" class="filter-modal">
+    <div>
+      <h3>Filter by Department</h3>
+      <input type="text" id="filter-department" placeholder="Enter Department">
+      <button onclick="confirmFilterDownload('Department')">Download</button>
+      <button onclick="closeFilterModal('Department-modal')">Cancel</button>
+    </div>
+  </div>
+
+  <div id="Designation-modal" class="filter-modal">
+    <div>
+      <h3>Filter by Designation</h3>
+      <input type="text" id="filter-designation" placeholder="Enter Designation (e.g., Professor)">
+      <button onclick="confirmFilterDownload('Designation')">Download</button>
+      <button onclick="closeFilterModal('Designation-modal')">Cancel</button>
+    </div>
+  </div>
+
+  <div id="Joining_Year-modal" class="filter-modal">
+    <div>
+      <h3>Filter by Joining Year</h3>
+      <input type="number" id="filter-joining-year" placeholder="Enter Joining Year">
+      <button onclick="confirmFilterDownload('Joining_Year')">Download</button>
+      <button onclick="closeFilterModal('Joining_Year-modal')">Cancel</button>
+    </div>
+  </div>
+
+  <div id="Employment_Status-modal" class="filter-modal">
+    <div>
+      <h3>Filter by Employment Status</h3>
+      <select id="filter-status">
+        <option value="">-- Select Status --</option>
+        <option value="Present">Present</option>
+        <option value="Ex-Teacher">Ex-Teacher</option>
+      </select>
+      <button onclick="confirmFilterDownload('Employment_Status')">Download</button>
+      <button onclick="closeFilterModal('Employment_Status-modal')">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    function showMessage(message, color = "green") {
+      const msgBox = document.getElementById("status-msg");
+      msgBox.textContent = message;
+      msgBox.style.color = color;
+      setTimeout(() => {
+        msgBox.textContent = "";
+      }, 5000);
+    }
+
+    let allTeachers = [];
+    let firstLoadComplete = false;
+    let teacherInterval;
+    let selectedTeacherId = null;
+    
+    // Teacher edit variables
+    let editingTeacherRowId = null;
+    let originalTeacherRowData = {};
+    let selectedTeacherIdForEdit = null;
+
+    // Processing state management
+    let isProcessing = false;
+
+    function setProcessingState(isActive, message = "Processing...") {
+      isProcessing = isActive;
+      const overlay = document.getElementById("processing-overlay");
+      const processingText = document.getElementById("processing-text");
+      
+      if (isActive) {
+        processingText.textContent = message;
+        overlay.style.display = "flex";
+        disableAllButtons();
+      } else {
+        overlay.style.display = "none";
+        enableAllButtons();
+      }
+    }
+
+    function disableAllButtons() {
+      // Main action buttons
+      document.getElementById("refresh-button").disabled = true;
+      document.getElementById("download-button").disabled = true;
+      document.getElementById("dashboard-btn").disabled = true;
+      document.querySelector(".back-btn").disabled = true;
+
+      // Dropdown buttons
+      const dropdownButtons = document.querySelectorAll(".dropdown-content button");
+      dropdownButtons.forEach(btn => btn.disabled = true);
+
+      // Table action buttons
+      const editButtons = document.querySelectorAll(".edit-btn");
+      editButtons.forEach(btn => btn.disabled = true);
+
+      const libraryButtons = document.querySelectorAll(".library-clearance-btn");
+      libraryButtons.forEach(btn => btn.disabled = true);
+
+      const saveButtons = document.querySelectorAll(".save-btn");
+      saveButtons.forEach(btn => btn.disabled = true);
+
+      const cancelButtons = document.querySelectorAll(".cancel-edit-btn");
+      cancelButtons.forEach(btn => btn.disabled = true);
+
+      // Modal buttons
+      const modalButtons = document.querySelectorAll(".confirm-btn, .cancel-btn");
+      modalButtons.forEach(btn => btn.disabled = true);
+
+      // Filter modal buttons
+      const filterButtons = document.querySelectorAll(".filter-modal button");
+      filterButtons.forEach(btn => btn.disabled = true);
+    }
+
+    function enableAllButtons() {
+      // Main action buttons
+      document.getElementById("refresh-button").disabled = false;
+      document.getElementById("download-button").disabled = false;
+      document.getElementById("dashboard-btn").disabled = false;
+      document.querySelector(".back-btn").disabled = false;
+
+      // Dropdown buttons
+      const dropdownButtons = document.querySelectorAll(".dropdown-content button");
+      dropdownButtons.forEach(btn => btn.disabled = false);
+
+      // Table action buttons
+      const editButtons = document.querySelectorAll(".edit-btn");
+      editButtons.forEach(btn => btn.disabled = false);
+
+      const libraryButtons = document.querySelectorAll(".library-clearance-btn:not([data-cleared])");
+      libraryButtons.forEach(btn => btn.disabled = false);
+
+      const saveButtons = document.querySelectorAll(".save-btn");
+      saveButtons.forEach(btn => btn.disabled = false);
+
+      const cancelButtons = document.querySelectorAll(".cancel-edit-btn");
+      cancelButtons.forEach(btn => btn.disabled = false);
+
+      // Modal buttons
+      const modalButtons = document.querySelectorAll(".confirm-btn, .cancel-btn");
+      modalButtons.forEach(btn => btn.disabled = false);
+
+      // Filter modal buttons
+      const filterButtons = document.querySelectorAll(".filter-modal button");
+      filterButtons.forEach(btn => btn.disabled = false);
+    }
+
+    async function fetchTeachers() {
+      const loadingText = document.getElementById("loading");
+
+      if (!firstLoadComplete) {
+        setProcessingState(true, "Loading teacher data...");
+        loadingText.style.display = "block";
+        loadingText.textContent = "Loading teacher data...";
+      }
+
+      try {
+        const teachers = await window.pywebview.api.fetch_teachers();
+        if (JSON.stringify(teachers) !== JSON.stringify(allTeachers)) {
+          allTeachers = teachers;
+          renderTeacherTable(teachers);
+          await updateTotalTeachers();
+        }
+
+        if (!firstLoadComplete) {
+          loadingText.style.display = "none";
+          teacherInterval = setInterval(fetchTeachers, 10000);
+          firstLoadComplete = true;
+          setProcessingState(false);
+        }
+      } catch (err) {
+        console.error("Error fetching:", err);
+        if (!firstLoadComplete) {
+          setProcessingState(false);
+        }
+      }
+    }
+
+    function renderTeacherTable(data) {
+      const table = document.getElementById("teacher-table");
+      while (table.rows.length > 1) table.deleteRow(1);
+
+      data.forEach(teacher => {
+        const row = table.insertRow();
+        row.setAttribute('data-teacher-id', teacher.Teacher_ID);
+        row.innerHTML = `
+          <td data-field="Teacher_ID">${teacher.Teacher_ID}</td>
+          <td data-field="Teacher_Name">${teacher.Teacher_Name}</td>
+          <td data-field="Designation">${teacher.Designation}</td>
+          <td data-field="Department">${teacher.Department}</td>
+          <td data-field="Teacher_Email">${teacher.Teacher_Email}</td>
+          <td data-field="Phone_Number">${teacher.Phone_Number}</td>
+          <td data-field="Address">${teacher.Address}</td>
+          <td data-field="Joining_Year">${teacher.Joining_Year}</td>
+          <td>${teacher.Employment_Status === "PRESENT"? `✔️` : `❌`}</td>
+          <td>
+          ${
+            teacher.Employment_Status === "PRESENT"
+              ? `<button class="library-clearance-btn" data-id="${teacher.Teacher_ID}" onclick="openTeacherexit('${teacher.Teacher_ID}')">📄</button>`
+              : `<span style="color: gray;">🚫</span>`
+          }
+        </td>
+        <td class="actions-cell">
+            <button class="edit-btn" onclick="confirmTeacherEdit('${teacher.Teacher_ID}')" title="Edit Teacher">✏️</button>
+        </td>
+        `;
+      });
+    }
+
+    async function updateTotalTeachers() {
+      try {
+        const count = await window.pywebview.api.total_teacher();
+        document.getElementById("total-teachers").textContent = `👩‍🏫 Total Teachers: ${count}`;
+      } catch (error) {
+        console.error("Error fetching total teacher count:", error);
+        document.getElementById("total-teachers").textContent = "👩‍🏫 Total Teachers: ❌";
+      }
+    }
+
+    function filterTeachers() {
+      const searchValue = document.getElementById("search-input").value.toLowerCase();
+      const filtered = allTeachers.filter(teacher =>
+        Object.values(teacher).some(value =>
+          String(value).toLowerCase().includes(searchValue)
+        )
+      );
+      renderTeacherTable(filtered);
+      document.getElementById("total-teachers").textContent = `👩‍🏫 Total Teachers: ${filtered.length}`;
+    }
+
+    document.getElementById("search-input").addEventListener("input", filterTeachers);
+
+    function goBack() {
+      if (isProcessing) return;
+      
+      setProcessingState(true, "Navigating back...");
+      
+      if (window.pywebview && window.pywebview.api) {
+        window.pywebview.api.go_back();
+      } else {
+        showMessage("❌ Unable to go back.","red");
+        setProcessingState(false);
+      }
+    }
+
+    function openTeacherEntry() {
+      if (isProcessing) return;
+      
+      setProcessingState(true, "Opening teacher entry...");
+      window.pywebview.api.open_teacher_entry();
+    }
+
+    function openTeacherexit(Teacher_ID) {
+      if (isProcessing) return;
+      
+      selectedTeacherId = Teacher_ID;
+      document.getElementById("confirmation-text").textContent =
+        `Are you sure you want to clear Teacher ID: ${Teacher_ID}?`;
+      document.getElementById("confirmation-modal").style.display = "flex";
+    }
+
+    document.getElementById("confirm-clearance").addEventListener("click", () => {
+      if (isProcessing) return;
+      
+      setProcessingState(true, "Processing library clearance...");
+      
+      const button = document.querySelector(`button[data-id="${selectedTeacherId}"]`);
+      const originalText = button.textContent;
+      button.textContent = "⏳ Clearing...";
+      document.getElementById("confirmation-modal").style.display = "none";
+
+      if (window.pywebview && window.pywebview.api) {
+        window.pywebview.api.open_teacher_exit(selectedTeacherId)
+          .then(res => {
+            if (res.status === "success") {
+              showMessage(`✅ Library clearance done for ${selectedTeacherId}`);
+              button.textContent = "✔️ Cleared";
+              button.disabled = true;
+              button.setAttribute('data-cleared', 'true');
+              button.style.backgroundColor = "#2C3E50";
+              button.style.cursor = "not-allowed";
+            } else {
+              showMessage(`${res.message}`, "red");
+              button.textContent = originalText;
+            }
+          })
+          .catch(err => {
+            console.error("Clearance error:", err);
+            showMessage(`❌ Error clearing library for ${selectedTeacherId}`, "red");
+            button.textContent = originalText;
+          })
+          .finally(() => {
+            selectedTeacherId = null;
+            setProcessingState(false);
+          });
+      } else {
+        showMessage("❌ Backend API not available.", "red");
+        button.textContent = originalText;
+        selectedTeacherId = null;
+        setProcessingState(false);
+      }
+    });
+
+    document.getElementById("cancel-clearance").addEventListener("click", () => {
+      document.getElementById("confirmation-modal").style.display = "none";
+      selectedTeacherId = null;
+    });
+
+    // Teacher Edit Functions
+    async function confirmTeacherEdit(teacherId) {
+      if (isProcessing) return;
+      
+      selectedTeacherIdForEdit = teacherId;
+      document.getElementById("edit-confirmation-text").textContent =
+        `Are you sure you want to edit Teacher ID: ${teacherId}?`;
+      document.getElementById("edit-confirmation-modal").style.display = "flex";
+    }
+
+    document.getElementById("confirm-edit").addEventListener("click", () => {
+      if (isProcessing) return;
+      
+      document.getElementById("edit-confirmation-modal").style.display = "none";
+      if (selectedTeacherIdForEdit) {
+        enableTeacherEdit(selectedTeacherIdForEdit);
+      }
+    });
+
+    document.getElementById("cancel-edit").addEventListener("click", () => {
+      document.getElementById("edit-confirmation-modal").style.display = "none";
+      selectedTeacherIdForEdit = null;
+    });
+
+    async function enableTeacherEdit(teacherId) {
+      if (isProcessing) return;
+      
+      if (editingTeacherRowId !== null) {
+        showMessage("Please finish editing the current row first.", "orange");
+        return;
+      }
+
+      setProcessingState(true, "Setting up edit mode...");
+
+      editingTeacherRowId = teacherId;
+      const row = document.querySelector(`tr[data-teacher-id="${teacherId}"]`);
+      if (!row) {
+        setProcessingState(false);
+        return;
+      }
+
+      // Store original data
+      originalTeacherRowData = {};
+      const cells = row.querySelectorAll('td[data-field]');
+      cells.forEach(cell => {
+        const field = cell.getAttribute('data-field');
+        originalTeacherRowData[field] = cell.textContent;
+        
+        // Skip Employment_Status field - make it non-editable
+        // if (field === 'Employment_Status') {
+        //   const nonEditableDiv = document.createElement('div');
+        //   nonEditableDiv.className = 'non-editable-field';
+        //   nonEditableDiv.textContent = cell.textContent;
+        //   nonEditableDiv.title = 'This field cannot be edited';
+        //   cell.innerHTML = '';
+        //   cell.appendChild(nonEditableDiv);
+        //   return;
+        // }
+        
+        const input = document.createElement('input');
+        input.className = 'editable-input';
+        input.value = cell.textContent;
+        input.setAttribute('data-field', field);
+        
+        // Special handling for different field types
+        if (field === 'Teacher_ID') {
+          input.type = 'text';
+          input.placeholder = 'Enter unique Teacher ID';
+          input.title = 'Warning: Changing Teacher ID may affect system references';
+        } else if (field === 'Teacher_Email') {
+          input.type = 'email';
+        } else if (field === 'Phone_Number') {
+          input.type = 'tel';
+        } else if (field === 'Joining_Year') {
+          input.type = 'number';
+          input.min = '1900';
+          input.max = new Date().getFullYear();
+        }
+        
+        cell.innerHTML = '';
+        cell.appendChild(input);
+      });
+
+      // Replace edit button with save and cancel buttons
+      const actionsCell = row.querySelector('.actions-cell');
+      actionsCell.innerHTML = `
+        <button class="save-btn" onclick="saveTeacherEdit('${teacherId}')" title="Save Changes">💾</button>
+        <button class="cancel-edit-btn" onclick="cancelTeacherEdit('${teacherId}')" title="Cancel Edit">❌</button>
+      `;
+
+      setProcessingState(false);
+    }
+
+    async function saveTeacherEdit(originalTeacherId) {
+      if (isProcessing) return;
+      
+      const row = document.querySelector(`tr[data-teacher-id="${originalTeacherId}"]`);
+      if (!row) return;
+
+      // Collect new data (excluding Employment_Status)
+      const newData = {};
+      const inputs = row.querySelectorAll('.editable-input');
+      
+      inputs.forEach(input => {
+        const field = input.getAttribute('data-field');
+        newData[field] = input.value.trim();
+      });
+
+      // Keep the original Employment_Status (non-editable)
+      newData['Employment_Status'] = originalTeacherRowData['Employment_Status'];
+
+      // Validate required fields
+      const requiredFields = ['Teacher_ID', 'Teacher_Name', 'Department', 'Teacher_Email'];
+      for (let field of requiredFields) {
+        if (!newData[field]) {
+          showMessage(`${field.replace('_', ' ')} is required.`, "red");
+          return;
+        }
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (newData.Teacher_Email && !emailRegex.test(newData.Teacher_Email)) {
+        showMessage("Please enter a valid email address.", "red");
+        return;
+      }
+
+      // Check if Teacher_ID changed and validate uniqueness
+      if (newData.Teacher_ID !== originalTeacherId) {
+        const existingTeacher = allTeachers.find(teacher => 
+          teacher.Teacher_ID === newData.Teacher_ID && teacher.Teacher_ID !== originalTeacherId
+        );
+        if (existingTeacher) {
+          showMessage("Teacher ID already exists. Please choose a different ID.", "red");
+          return;
+        }
+      }
+
+      setProcessingState(true, "Saving teacher information...");
+
+      try {
+        // Show loading state on save button
+        const saveBtn = row.querySelector('.save-btn');
+        const originalText = saveBtn.textContent;
+        saveBtn.textContent = '⏳';
+
+        // Call API to update teacher
+        const result = await window.pywebview.api.update_teacher(newData, originalTeacherId);
+        
+        if (result.success === true) {
+          showMessage(`✅ Teacher ${originalTeacherId} updated successfully!`, "green");
+          
+          // Update the row with new data
+          inputs.forEach(input => {
+            const field = input.getAttribute('data-field');
+            const cell = input.parentNode;
+            cell.textContent = newData[field];
+          });
+
+          // Update Employment_Status cell (restore non-editable display)
+          const statusCell = row.querySelector('td[data-field="Employment_Status"]');
+          statusCell.textContent = newData['Employment_Status'];
+
+          // Update the row's data-teacher-id attribute if Teacher_ID changed
+          if (newData.Teacher_ID !== originalTeacherId) {
+            row.setAttribute('data-teacher-id', newData.Teacher_ID);
+          }
+
+          // Reset actions buttons with new teacher ID
+          const actionsCell = row.querySelector('.actions-cell');
+          actionsCell.innerHTML = `
+            <button class="edit-btn" onclick="confirmTeacherEdit('${newData.Teacher_ID}')" title="Edit Teacher">✏️</button>
+          `;
+
+          editingTeacherRowId = null;
+          originalTeacherRowData = {};
+          
+          // Refresh data to ensure consistency
+          setTimeout(() => fetchTeachers(), 1000);
+        } else {
+          throw new Error(result.message || "Update failed");
+        }
+      } catch (error) {
+        // alert(error)
+        console.error("Error updating teacher:", error);
+        showMessage(`❌ Error updating teacher: ${error.message}`, "red");
+        
+        // Re-enable save button
+        const saveBtn = row.querySelector('.save-btn');
+        saveBtn.textContent = originalText;
+      } finally {
+        setProcessingState(false);
+      }
+    }
+
+    async function cancelTeacherEdit(teacherId) {
+      if (isProcessing) return;
+      
+      const row = document.querySelector(`tr[data-teacher-id="${teacherId}"]`);
+      if (!row) return;
+
+      // Restore original data
+      const cells = row.querySelectorAll('td[data-field]');
+      cells.forEach(cell => {
+        const field = cell.getAttribute('data-field');
+        if (originalTeacherRowData[field] !== undefined) {
+          cell.textContent = originalTeacherRowData[field];
+        }
+      });
+
+      // Reset actions buttons
+      const actionsCell = row.querySelector('.actions-cell');
+      actionsCell.innerHTML = `
+        <button class="edit-btn" onclick="confirmTeacherEdit('${teacherId}')" title="Edit Teacher">✏️</button>
+      `;
+
+      editingTeacherRowId = null;
+      originalTeacherRowData = {};
+      showMessage("Edit cancelled.", "orange");
+    }
+
+    // Dropdown toggle for teacher download menu
+    document.getElementById("download-button").addEventListener("click", e => {
+      if (isProcessing) return;
+      
+      e.stopPropagation();
+      document.querySelector(".dropdown-content").classList.toggle("show");
+    });
+    
+    window.addEventListener("click", () => {
+      const d = document.querySelector(".dropdown-content");
+      if (d.classList.contains("show")) d.classList.remove("show");
+    });
+
+    function openFilterModal(id) { 
+      if (isProcessing) return;
+      
+      document.getElementById(id).style.display = "flex"; 
+    }
+    
+    function closeFilterModal(id) { 
+      document.getElementById(id).style.display = "none"; 
+    }
+
+    async function confirmFilterDownload(type) {
+      if (isProcessing) return;
+      
+      let val = "";
+      let modalId = "";
+      let params = { Department: null, Designation: null, Joining_Year: null, Employment_Status: null };
+
+      if (type === "Department") {
+        val = document.getElementById("filter-department").value;
+        modalId = "Department-modal";
+        params.Department = val.trim();
+
+      } else if (type === "Designation") {
+        val = document.getElementById("filter-designation").value;
+        modalId = "Designation-modal";
+        params.Designation = val.trim();
+
+      } else if (type === "Joining_Year") {
+        val = document.getElementById("filter-joining-year").value;
+        modalId = "Joining_Year-modal";
+        params.Joining_Year = val.trim();
+
+      } else if (type === "Employment_Status") {
+        val = document.getElementById("filter-status").value;
+        modalId = "Employment_Status-modal";
+        params.Employment_Status = val || null;
+      }
+
+      await triggerDownload(params);
+      clearFilters();
+      closeFilterModal(modalId);
+    }
+
+    async function downloadAll() { 
+      if (isProcessing) return;
+      
+      await triggerDownload(); 
+    }
+
+    // Call backend API with filters (defaults to full list if all null)
+    async function triggerDownload(filters = {}) {
+      setProcessingState(true, "Preparing download...");
+
+      try {
+        const res = await window.pywebview.api.download(
+          filters.Department || null,
+          filters.Designation || null,
+          filters.Joining_Year || null,
+          filters.Employment_Status || null
+        );
+
+        if (res) {
+          if (Object.values(filters).some(v => v)) {
+            showMessage("✅ Downloaded filtered teachers", "green");
+          } else {
+            showMessage("✅ Downloaded full teacher list", "green");
+          }
+        } else {
+          showMessage("❌ No records found or error downloading", "red");
+        }
+      } catch (e) {
+        console.error(e);
+        showMessage("❌ An error occurred", "red");
+      } finally {
+        setProcessingState(false);
+      }
+    }
+
+    function clearFilters() {
+      document.getElementById("filter-department").value = "";
+      document.getElementById("filter-designation").value = "";
+      document.getElementById("filter-joining-year").value = "";
+      document.getElementById("filter-status").value = "";
+    }
+
+    window.addEventListener("beforeunload", () => {
+      if (teacherInterval) clearInterval(teacherInterval);
+    });
+
+    // Initialize the page
+    // fetchTeachers();
+    setInterval(fetchTeachers, 1000);
+  </script>
+</body>
+</html>

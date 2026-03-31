@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Library Portal</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #f1f5f9;
+      --accent: #06b6d4;
+      --text-primary: #0f172a;
+      --text-secondary: #64748b;
+      --surface: rgba(255, 255, 255, 0.9);
+      --border: rgba(148, 163, 184, 0.2);
+      --shadow: rgba(0, 0, 0, 0.1);
+      --shadow-lg: rgba(0, 0, 0, 0.2);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #2C3E50 0%, #34495E 35%, #3498DB 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Animated background elements */
+    .bg-decoration {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .bg-decoration::before,
+    .bg-decoration::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .bg-decoration::before {
+      width: 300px;
+      height: 300px;
+      top: -150px;
+      right: -150px;
+      animation-delay: -2s;
+    }
+
+    .bg-decoration::after {
+      width: 200px;
+      height: 200px;
+      bottom: -100px;
+      left: -100px;
+      animation-delay: -4s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+    }
+
+    .back-btn {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 20px;
+      color: var(--text-primary);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 10;
+      box-shadow: 0 4px 6px -1px var(--shadow);
+    }
+
+    .back-btn:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 10px 25px -3px var(--shadow-lg);
+      background: rgba(255, 255, 255, 1);
+    }
+
+    .login-container {
+      background: var(--surface);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      padding: 48px 40px;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 25px 50px -12px var(--shadow-lg);
+      position: relative;
+      z-index: 1;
+      animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .logo-section {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+
+
+    h2 {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 16px;
+      font-weight: 400;
+    }
+
+    .form-group {
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      font-size: 20px;
+      z-index: 2;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 16px 16px 16px 52px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 400;
+      background: rgba(255, 255, 255, 0.8);
+      color: var(--text-primary);
+      outline: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+    }
+
+    input:focus {
+      border-color: var(--primary);
+      background: rgba(255, 255, 255, 1);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+      transform: translateY(-1px);
+    }
+
+    input::placeholder {
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+.save-password-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  font-size: 15px;
+  color: #64748b; /* Muted slate gray text */
+  background-color: #f1f5f9; /* Optional: soft gray background for visual match */
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.save-password-container input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: #ffffff;
+  border: 2px solid #cbd5e1;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-block;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.save-password-container input[type="checkbox"]:checked {
+  background-color: #6366f1; /* Soft primary color when checked */
+  border-color: #6366f1;
+}
+
+.save-password-container input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 6px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.save-password-container label {
+  font-size: 14px;
+  color: #64748b; /* Muted text */
+  cursor: pointer;
+}
+
+
+
+
+    .btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 12px;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-btn {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.4);
+      margin-bottom: 24px;
+    }
+
+    .login-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px 0 rgba(99, 102, 241, 0.5);
+    }
+
+    .login-btn:active {
+      transform: translateY(0);
+    }
+
+    .login-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.2);
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .forgot-password {
+      text-align: center;
+    }
+
+    .forgot-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .forgot-link:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+
+    .status {
+      margin-bottom: 16px;
+      text-align: center;
+      font-weight: 500;
+      font-size: 14px;
+      min-height: 20px;
+      padding: 8px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .status.success {
+      background: rgba(34, 197, 94, 0.1);
+      color: #059669;
+      border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+
+    .status.error {
+      background: rgba(239, 68, 68, 0.1);
+      color: #dc2626;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .loading-spinner {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .btn.loading .loading-spinner {
+      display: inline-block;
+    }
+
+    @media (max-width: 480px) {
+      .login-container {
+        margin: 20px;
+        padding: 32px 24px;
+      }
+      
+      .back-btn {
+        top: 16px;
+        left: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-decoration"></div>
+  
+  <button class="back-btn" onclick="goBack()" aria-label="Go back">
+    ←
+  </button>
+
+  <div class="login-container">
+    <div class="logo-section">
+
+      <h2>Welcome Back</h2>
+      <p class="subtitle">Access your digital library</p>
+    </div>
+
+    <div id="status-msg" class="status"></div>
+
+    <form onsubmit="return false;">
+      <div class="form-group">
+        <div class="input-wrapper">
+          <div class="input-icon">👤</div>
+          <input type="text" id="username" placeholder="Enter your User ID" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="input-wrapper">
+          <div class="input-icon">🔒</div>
+          <input type="password" id="password" placeholder="Enter your password" required>
+        </div>
+      </div>
+
+      <div class="save-password-container">
+        <input type="checkbox" id="savePassword" name="savePassword">
+        <label for="savePassword">Remember Me</label>
+      </div>
+
+      <button class="btn login-btn" onclick="login()" id="loginBtn">
+        <div class="loading-spinner"></div>
+        <span class="btn-text">Sign In</span>
+      </button>
+    </form>
+
+    <div class="forgot-password">
+      <a href="#" class="forgot-link" onclick="ForgotPassword()">Forgot your password?</a>
+    </div>
+  </div>
+
+ <script>
+  const usernameInput = document.getElementById("username");
+  const passwordInput = document.getElementById("password");
+  const savePasswordCheckbox = document.getElementById("savePassword");
+  const loginBtn = document.getElementById("loginBtn");
+  const btnText = loginBtn.querySelector(".btn-text");
+  const spinner = loginBtn.querySelector(".loading-spinner");
+  const msgBox = document.getElementById("status-msg");
+
+  function showMessage(message, color = "green") {
+    msgBox.textContent = message;
+    msgBox.style.color = color;
+    msgBox.classList.remove("success", "error");
+    if (color === "green") msgBox.classList.add("success");
+    else if (color === "red" || color === "orange") msgBox.classList.add("error");
+
+    setTimeout(() => {
+      msgBox.textContent = "";
+      msgBox.classList.remove("success", "error");
+    }, 4000);
+  }
+
+  async function login() {
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value.trim();
+    const savePassword = savePasswordCheckbox.checked;
+
+    if (!username || !password) {
+      showMessage("⚠️ Please enter User ID and Password!", "orange");
+      return;
+    }
+
+    btnText.textContent = "Logging in...";
+    spinner.style.display = "inline-block";
+    loginBtn.disabled = true;
+
+    try {
+      const response = await window.pywebview.api.login(username, password, savePassword);
+
+      if (response === true) {
+        showMessage("✅ Login Successful!", "green");
+      } else {
+        showMessage("❌ Login Failed: " + response, "red");
+      }
+    } catch (error) {
+      showMessage("❌ Login Error: " + error.message, "red");
+    } finally {
+      btnText.textContent = "Sign In";
+      spinner.style.display = "none";
+      loginBtn.disabled = false;
+    }
+  }
+
+  function goBack() {
+    if (window.pywebview) {
+      window.pywebview.api.go_back();
+    } else {
+      window.history.back();
+    }
+  }
+
+  function ForgotPassword() {
+    window.pywebview.api.forget_password();
+  }
+
+  // Optional: attach listeners once DOM is ready (more scalable)
+  document.addEventListener("DOMContentLoaded", () => {
+    loginBtn.addEventListener("click", login);
+  });
+</script>
+
+</body>
+</html>

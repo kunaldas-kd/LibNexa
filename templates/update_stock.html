@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📖 Book Inventory Portal</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #2C3E50;
+      --primary-light: #3498DB;
+      --primary-dark: #1A252F;
+      --accent: #3498DB;
+      --success: #27AE60;
+      --warning: #F39C12;
+      --danger: #E74C3C;
+      --bg-primary: #F8FAFC;
+      --bg-secondary: #FFFFFF;
+      --bg-card: rgba(255, 255, 255, 0.8);
+      --text-primary: #1E293B;
+      --text-secondary: #64748B;
+      --border: rgba(44, 62, 80, 0.1);
+      --shadow: 0 25px 50px -12px rgba(44, 62, 80, 0.15);
+      --glow: 0 0 30px rgba(52, 152, 219, 0.2);
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, #E8F4FD 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(52, 152, 219, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(44, 62, 80, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(52, 152, 219, 0.03) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.9);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+    }
+
+    .header-content {
+      max-width: 2200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      position: relative;
+    }
+    
+    .back-btn {
+      background: rgba(44, 62, 80, 0.08);
+      border: 1px solid var(--border);
+      color: var(--primary);
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      margin-right: 10px;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+    }
+
+    .back-btn:hover {
+      background: rgba(44, 62, 80, 0.12);
+      transform: translateX(-2px);
+      box-shadow: var(--glow);
+    }
+    
+    .header-title {
+      font-size: 2.5rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .main-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    
+    .form-container {
+      width: 100%;
+      max-width: 1200px;
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 3rem;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .form-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+    
+    .form-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .form-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+    
+    .form-subtitle {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    
+    .status-message {
+      margin-bottom: 2rem;
+      padding: 1rem;
+      border-radius: 12px;
+      font-weight: 500;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+      min-height: 20px;
+    }
+
+    .status-message.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .status-message.success {
+      background: rgba(39, 174, 96, 0.1);
+      border: 1px solid rgba(39, 174, 96, 0.3);
+      color: #2ECC71;
+    }
+
+    .status-message.error {
+      background: rgba(231, 76, 60, 0.1);
+      border: 1px solid rgba(231, 76, 60, 0.3);
+      color: #E74C3C;
+    }
+
+    .status-message.warning {
+      background: rgba(243, 156, 18, 0.1);
+      border: 1px solid rgba(243, 156, 18, 0.3);
+      color: #F39C12;
+    }
+    
+    .entry-mode-selector {
+      background: rgba(248, 250, 252, 0.8);
+      border-radius: 16px;
+      padding: 8px;
+      display: flex;
+      gap: 8px;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+    }
+    
+    .mode-option {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--text-secondary);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .mode-option.active {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(44, 62, 80, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .mode-option:hover:not(.active) {
+      background: rgba(44, 62, 80, 0.05);
+      color: var(--text-primary);
+    }
+    
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent);
+      border-radius: 6px;
+      font-size: 12px;
+      color: white;
+    }
+    
+    .form-group-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .label-icon {
+      color: var(--accent);
+      font-size: 12px;
+    }
+    
+    .form-group input, 
+    .form-group select {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      font-weight: 400;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+    }
+    
+    .form-group input:focus, 
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
+      transform: translateY(-1px);
+    }
+    
+    .form-group input::placeholder {
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .form-group input.error {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.1);
+    }
+    
+    .file-upload-area {
+      border: 2px dashed var(--border);
+      border-radius: 16px;
+      padding: 3rem 2rem;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.5);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+    }
+    
+    .file-upload-area:hover {
+      border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.7);
+      transform: translateY(-2px);
+    }
+    
+    .file-upload-area.dragover {
+      border-color: var(--accent);
+      background: rgba(52, 152, 219, 0.05);
+      box-shadow: var(--glow);
+    }
+    
+    .upload-icon {
+      font-size: 3rem;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .file-upload-area:hover .upload-icon {
+      color: var(--accent);
+      transform: scale(1.1);
+    }
+    
+    .upload-text {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+    
+    .upload-subtext {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+    
+    .file-input {
+      display: none;
+    }
+
+    .selected-file {
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      background: rgba(39, 174, 96, 0.1);
+      border: 1px solid rgba(39, 174, 96, 0.3);
+      border-radius: 8px;
+      color: var(--success);
+      font-size: 0.875rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .submit-btn {
+      width: 100%;
+      padding: 1.25rem 2rem;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      border: none;
+      border-radius: 16px;
+      color: #FFFFFF;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .submit-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    .submit-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 40px rgba(44, 62, 80, 0.3);
+      background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent) 100%);
+    }
+
+    .submit-btn:hover::before {
+      left: 100%;
+    }
+
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+
+    .submit-btn:disabled {
+      background: rgba(44, 62, 80, 0.1);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .loader {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .floating-elements {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .floating-element {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 50%;
+      opacity: 0.1;
+      animation: float 20s infinite linear;
+    }
+
+    .floating-element:nth-child(1) { left: 10%; animation-delay: 0s; }
+    .floating-element:nth-child(2) { left: 20%; animation-delay: 2s; }
+    .floating-element:nth-child(3) { left: 30%; animation-delay: 4s; }
+    .floating-element:nth-child(4) { left: 40%; animation-delay: 6s; }
+    .floating-element:nth-child(5) { left: 50%; animation-delay: 8s; }
+    .floating-element:nth-child(6) { left: 60%; animation-delay: 10s; }
+    .floating-element:nth-child(7) { left: 70%; animation-delay: 12s; }
+    .floating-element:nth-child(8) { left: 80%; animation-delay: 14s; }
+    .floating-element:nth-child(9) { left: 90%; animation-delay: 16s; }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.1;
+      }
+      90% {
+        opacity: 0.1;
+      }
+      100% {
+        transform: translateY(-10vh) scale(1);
+        opacity: 0;
+      }
+    }
+    
+    .hidden {
+      display: none !important;
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .shake {
+      animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .form-container {
+        padding: 2rem;
+        margin: 1rem;
+      }
+      
+      .header {
+        padding: 1rem;
+      }
+      
+      .main-content {
+        padding: 1rem;
+      }
+      
+      .form-group-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      
+      .entry-mode-selector {
+        flex-direction: column;
+      }
+      
+      .button-group {
+        flex-direction: column;
+      }
+
+      .header-title {
+        position: static;
+        transform: none;
+        font-size: 1.75rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .form-container {
+        padding: 1.5rem;
+        border-radius: 16px;
+      }
+      
+      .header-title {
+        font-size: 1.25rem;
+      }
+      
+      .section-title {
+        font-size: 1rem;
+      }
+    }
+    
+    /* Modern scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(248, 250, 252, 0.8);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-light);
+    }
+  </style>
+</head>
+<body>
+  <div class="floating-elements">
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+  </div>
+
+  <div class="container">
+    <header class="header">
+      <div class="header-content">
+        <button class="back-btn" onclick="goBack()" title="Go Back">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="header-title">
+          Book Inventory Portal
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="form-container">
+        <div class="form-header">
+          <h1 class="form-title">Add Book Inventory</h1>
+          <p class="form-subtitle">Manage your library collection efficiently</p>
+        </div>
+
+        <div id="status-msg" class="status-message"></div>
+
+        <div class="form-section">
+          <div class="entry-mode-selector">
+            <button class="mode-option active" onclick="setEntryMode('manual')">
+              <i class="fas fa-keyboard"></i>
+              Manual Entry
+            </button>
+            <button class="mode-option" onclick="setEntryMode('excel')">
+              <i class="fas fa-file-excel"></i>
+              Excel Upload
+            </button>
+          </div>
+
+          <!-- Manual Input Form -->
+          <div id="manualForm" class="fade-in">
+            <div class="section-title">
+              <span class="section-icon">
+                <i class="fas fa-book"></i>
+              </span>
+              Book Information
+            </div>
+            
+            <div class="form-group-row">
+              <div class="form-group">
+                <label for="bookName">
+                  <i class="fas fa-book label-icon"></i>
+                  Book Name *
+                </label>
+                <input type="text" id="bookName" placeholder="Enter the book name" required />
+              </div>
+              <div class="form-group">
+                <label for="author">
+                  <i class="fas fa-user-edit label-icon"></i>
+                  Author *
+                </label>
+                <input type="text" id="author" placeholder="Enter the author's name" required />
+              </div>
+            </div>
+
+            <div class="form-group-row">
+              <div class="form-group">
+                <label for="year">
+                  <i class="fas fa-calendar-alt label-icon"></i>
+                  Published Year *
+                </label>
+                <input type="number" id="year" placeholder="Enter publication year" min="1800" max="2030" required />
+              </div>
+              <div class="form-group">
+                <label for="edition">
+                  <i class="fas fa-bookmark label-icon"></i>
+                  Edition
+                </label>
+                <input type="text" id="edition" placeholder="Enter the edition" />
+              </div>
+            </div>
+
+            <div class="form-group-row">
+              <div class="form-group">
+                <label for="publisher">
+                  <i class="fas fa-building label-icon"></i>
+                  Publisher *
+                </label>
+                <input type="text" id="publisher" placeholder="Enter the publisher's name" required />
+              </div>
+              <div class="form-group">
+                <label for="place_of_publication">
+                  <i class="fas fa-map-marker-alt label-icon"></i>
+                  Place of Publication
+                </label>
+                <input type="text" id="place_of_publication" placeholder="Enter place of publication" />
+              </div>
+            </div>
+
+            <div class="form-group-row">
+              <div class="form-group">
+                <label for="qty">
+                  <i class="fas fa-boxes label-icon"></i>
+                  Quantity *
+                </label>
+                <input type="number" id="qty" placeholder="Enter quantity" min="1" required />
+              </div>
+              <div class="form-group">
+                <label for="price">
+                  <i class="fas fa-tag label-icon"></i>
+                  Price *
+                </label>
+                <input type="number" id="price" placeholder="Enter price" min="0" step="0.01" required />
+              </div>
+            </div>
+
+            <div class="form-group-row">
+              <div class="form-group">
+                <label for="order_challan_bill_info">
+                  <i class="fas fa-receipt label-icon"></i>
+                  Order/Challan/Bill Info
+                </label>
+                <input type="text" id="order_challan_bill_info" placeholder="Enter order/challan/bill info" />
+              </div>
+              <div class="form-group">
+                <label for="source">
+                  <i class="fas fa-store label-icon"></i>
+                  Source
+                </label>
+                <input type="text" id="source" placeholder="Enter the source" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Excel Upload Form -->
+          <div id="excelForm" class="hidden">
+            <div class="section-title">
+              <span class="section-icon">
+                <i class="fas fa-file-upload"></i>
+              </span>
+              Upload Excel File
+            </div>
+            
+            <div class="file-upload-area" onclick="document.getElementById('fileInput').click()" ondrop="handleFileDrop(event)" ondragover="handleDragOver(event)" ondragenter="handleDragEnter(event)" ondragleave="handleDragLeave(event)">
+              <div class="upload-icon">
+                <i class="fas fa-cloud-upload-alt"></i>
+              </div>
+              <div class="upload-text">Choose Excel File</div>
+              <div class="upload-subtext">or drag and drop your .xlsx or .xls file here</div>
+              <input 
+                type="file" 
+                id="fileInput" 
+                class="file-input" 
+                accept=".xlsx,.xls" 
+                onchange="handleFileSelect(this)"
+              />
+            </div>
+            <div id="selectedFileName" class="selected-file hidden"></div>
+          </div>
+
+          <div class="button-group">
+            <button class="submit-btn" id="submit-btn" onclick="submitStock()">
+              <i class="fas fa-plus-circle"></i>
+              Add Book to Inventory
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let currentMode = 'manual';
+
+    function showMessage(message, type = "success") {
+      const msgBox = document.getElementById("status-msg");
+      msgBox.textContent = message;
+      msgBox.className = `status-message ${type} show`;
+      
+      setTimeout(() => {
+        msgBox.classList.remove('show');
+        setTimeout(() => {
+          msgBox.textContent = "";
+          msgBox.className = "status-message";
+        }, 300);
+      }, 5000);
+    }
+
+    function setEntryMode(mode) {
+      currentMode = mode;
+      
+      // Update button states
+      document.querySelectorAll('.mode-option').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+      
+      // Toggle forms
+      const manualForm = document.getElementById('manualForm');
+      const excelForm = document.getElementById('excelForm');
+      
+      if (mode === 'manual') {
+        manualForm.classList.remove('hidden');
+        manualForm.classList.add('fade-in');
+        excelForm.classList.add('hidden');
+      } else {
+        excelForm.classList.remove('hidden');
+        excelForm.classList.add('fade-in');
+        manualForm.classList.add('hidden');
+      }
+    }
+
+    function handleFileSelect(input) {
+      const selectedFile = document.getElementById('selectedFileName');
+      
+      if (input.files.length > 0) {
+        selectedFile.innerHTML = `
+          <i class="fas fa-file-excel"></i>
+          Selected: ${input.files[0].name}
+        `;
+        selectedFile.classList.remove('hidden');
+      } else {
+        selectedFile.classList.add('hidden');
+      }
+    }
+
+    function handleFileDrop(event) {
+      event.preventDefault();
+      const uploadArea = event.target.closest('.file-upload-area');
+      uploadArea.classList.remove('dragover');
+      
+      const files = event.dataTransfer.files;
+      if (files.length > 0) {
+        const fileInput = document.getElementById('fileInput');
+        fileInput.files = files;
+        handleFileSelect(fileInput);
+      }
+    }
+
+    function handleDragOver(event) {
+      event.preventDefault();
+    }
+
+    function handleDragEnter(event) {
+      event.preventDefault();
+      event.target.closest('.file-upload-area').classList.add('dragover');
+    }
+
+    function handleDragLeave(event) {
+      event.preventDefault();
+      if (!event.target.closest('.file-upload-area').contains(event.relatedTarget)) {
+        event.target.closest('.file-upload-area').classList.remove('dragover');
+      }
+    }
+
+    function validateForm() {
+      const requiredFields = ['bookName', 'author', 'year', 'publisher', 'qty', 'price'];
+      let isValid = true;
+      let firstErrorField = null;
+
+      requiredFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        const value = field.value.trim();
+        
+        field.classList.remove('error');
+        
+        if (!value) {
+          field.classList.add('error');
+          if (!firstErrorField) firstErrorField = field;
+          isValid = false;
+        }
+      });
+
+      // Validate numeric fields
+      const qty = document.getElementById('qty');
+      const price = document.getElementById('price');
+      const year = document.getElementById('year');
+
+      if (qty.value && (isNaN(qty.value) || parseInt(qty.value) <= 0)) {
+        qty.classList.add('error');
+        if (!firstErrorField) firstErrorField = qty;
+        isValid = false;
+      }
+
+      if (price.value && (isNaN(price.value) || parseFloat(price.value) < 0)) {
+        price.classList.add('error');
+        if (!firstErrorField) firstErrorField = price;
+        isValid = false;
+      }
+
+      const currentYear = new Date().getFullYear();
+      if (year.value && (isNaN(year.value) || parseInt(year.value) < 1800 || parseInt(year.value) > currentYear + 1)) {
+        year.classList.add('error');
+        if (!firstErrorField) firstErrorField = year;
+        isValid = false;
+      }
+
+      if (!isValid && firstErrorField) {
+        firstErrorField.focus();
+        firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      return isValid;
+    }
+
+    async function submitStock() {
+      const button = document.getElementById("submit-btn");
+      const originalText = button.innerHTML;
+
+      button.disabled = true;
+      button.innerHTML = '<div class="loader"></div> Processing...';
+
+      try {
+        const isSuccess = await submit();
+        
+        if (isSuccess) {
+          button.innerHTML = "✅ Success!";
+          setTimeout(() => {
+            button.innerHTML = originalText;
+            button.disabled = false;
+          }, 2000);
+        } else {
+          button.innerHTML = originalText;
+          button.disabled = false;
+          // Add shake animation to form
+          document.querySelector('.form-container').classList.add('shake');
+          setTimeout(() => {
+            document.querySelector('.form-container').classList.remove('shake');
+          }, 500);
+        }
+      } catch (error) {
+        button.innerHTML = originalText;
+        button.disabled = false;
+        showMessage("❌ An unexpected error occurred", "error");
+      }
+    }
+
+    async function submit() {
+      return currentMode === 'manual' ? await submitStockInfo() : await uploadStockData();
+    }
+
+    async function submitStockInfo() {
+      if (!validateForm()) {
+        showMessage("⚠️ Please fill in all required fields correctly!", "warning");
+        return false;
+      }
+
+      const bookData = {
+        bookName: document.getElementById("bookName").value.trim(),
+        author: document.getElementById("author").value.trim(),
+        year: document.getElementById("year").value.trim(),
+        edition: document.getElementById("edition").value.trim() || '',
+        publisher: document.getElementById("publisher").value.trim(),
+        place_of_publication: document.getElementById("place_of_publication").value.trim() || '',
+        qty: parseInt(document.getElementById("qty").value.trim()),
+        price: parseFloat(document.getElementById("price").value.trim()),
+        order_challan_bill_info: document.getElementById("order_challan_bill_info").value.trim() || '',
+        source: document.getElementById("source").value.trim() || ''
+      };
+
+      try {
+        // Simulate API call for demo purposes
+        // await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // In real implementation, this would be:
+        const response = await window.pywebview.api.submit_Book_Info(bookData);
+        
+        // For demo, simulate success
+        // const response = ;
+        
+        if (response && response.includes("successfully")) {
+          showMessage("✅ Book added to inventory successfully!", "success");
+          clearManualFields();
+          return true;
+        } else {
+          showMessage(`❌ Submission failed: ${response}`, "error");
+          return false;
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        showMessage("❌ Network error. Please try again.", "error");
+        return false;
+      }
+    }
+
+    async function uploadStockData() {
+      const fileInput = document.getElementById("fileInput");
+      
+      if (!fileInput.files.length) {
+        showMessage("⚠️ Please select an Excel file to upload.", "warning");
+        return false;
+      }
+
+      const file = fileInput.files[0];
+      const fileName = file.name;
+
+      // Validate file type
+      const allowedTypes = ['.xlsx', '.xls'];
+      const fileExtension = fileName.toLowerCase().substring(fileName.lastIndexOf('.'));
+      
+      if (!allowedTypes.includes(fileExtension)) {
+        showMessage("❌ Please select a valid Excel file (.xlsx or .xls)", "error");
+        return false;
+      }
+
+      // Validate file size (max 10MB)
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (file.size > maxSize) {
+        showMessage("❌ File size too large. Please select a file under 10MB.", "error");
+        return false;
+      }
+
+      try {
+        // Simulate API call for demo purposes
+        // await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // In real implementation, this would be:
+        const response = await window.pywebview.api.upload_Book_Data(fileName);
+        
+        // For demo, simulate success
+        // const response = "Book data uploaded successfully!";
+
+        if (response && response.includes("successfully")) {
+          showMessage("✅ Excel data uploaded successfully!", "success");
+          clearExcelForm();
+          return true;
+        } else {
+          showMessage(`❌ Upload failed: ${response}`, "error");
+          return false;
+        }
+      } catch (error) {
+        console.error("Upload error:", error);
+        showMessage("❌ Upload failed. Please try again.", "error");
+        return false;
+      }
+    }
+
+    function clearForm() {
+      if (currentMode === 'manual') {
+        clearManualFields();
+      } else {
+        clearExcelForm();
+      }
+    }
+
+    function clearManualFields() {
+      const fieldIds = [
+        "bookName", "author", "year", "edition", "publisher",
+        "place_of_publication", "qty", "price", "order_challan_bill_info", "source"
+      ];
+      
+      fieldIds.forEach(id => {
+        const field = document.getElementById(id);
+        field.value = "";
+        field.classList.remove('error');
+      });
+    }
+
+    function clearExcelForm() {
+      const fileInput = document.getElementById("fileInput");
+      const selectedFile = document.getElementById("selectedFileName");
+      
+      fileInput.value = "";
+      selectedFile.classList.add("hidden");
+      selectedFile.innerHTML = "";
+    }
+
+    function goBack() {
+      if (window.pywebview?.api?.go_back) {
+        window.pywebview.api.go_back();
+      } else {
+        // For demo purposes, show a message
+        showMessage("🔙 Back button clicked (demo mode)", "success");
+      }
+    }
+
+    // Auto-save draft functionality (stores in memory only)
+    let draftData = {};
+    
+    function saveDraft() {
+      if (currentMode === 'manual') {
+        const fieldIds = [
+          "bookName", "author", "year", "edition", "publisher",
+          "place_of_publication", "qty", "price", "order_challan_bill_info", "source"
+        ];
+        
+        fieldIds.forEach(id => {
+          const field = document.getElementById(id);
+          if (field.value.trim()) {
+            draftData[id] = field.value.trim();
+          }
+        });
+      }
+    }
+
+    function loadDraft() {
+      Object.keys(draftData).forEach(id => {
+        const field = document.getElementById(id);
+        if (field) {
+          field.value = draftData[id];
+        }
+      });
+    }
+
+    // Initialize auto-save
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add input listeners for auto-save
+      const inputs = document.querySelectorAll('#manualForm input');
+      inputs.forEach(input => {
+        input.addEventListener('input', debounce(saveDraft, 1000));
+      });
+
+      // Load any existing draft
+      loadDraft();
+    });
+
+    // Utility function for debouncing
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // Add keyboard shortcuts
+    document.addEventListener('keydown', function(event) {
+      // Ctrl/Cmd + Enter to submit
+      if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+        event.preventDefault();
+        submitStock();
+      }
+
+      // Escape to go back
+      if (event.key === 'Escape') {
+        goBack();
+      }
+    });
+
+    // Add form validation on blur
+    document.querySelectorAll('input[required]').forEach(input => {
+      input.addEventListener('blur', function() {
+        if (!this.value.trim()) {
+          this.classList.add('error');
+        } else {
+          this.classList.remove('error');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

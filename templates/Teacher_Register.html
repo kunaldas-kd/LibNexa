@@ -1,0 +1,1078 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teacher Borrow Register</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200px 0; }
+      100% { background-position: calc(200px + 100%) 0; }
+    }
+
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-color: #2c3e50;
+      --primary-light: #34495e;
+      --primary-dark: #1a252f;
+      --accent-color: #3498db;
+      --accent-hover: #2980b9;
+      --success-color: #27ae60;
+      --warning-color: #f39c12;
+      --danger-color: #e74c3c;
+      --background-gradient: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%);
+      --glass-bg: rgba(255, 255, 255, 0.9);
+      --glass-border: rgba(44, 62, 80, 0.1);
+      --shadow-light: 0 4px 15px rgba(44, 62, 80, 0.08);
+      --shadow-medium: 0 8px 25px rgba(44, 62, 80, 0.15);
+      --shadow-heavy: 0 20px 40px rgba(44, 62, 80, 0.2);
+    }
+
+    body {
+      background: var(--background-gradient);
+      color: var(--primary-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      animation: fadeIn 1.5s ease-in-out;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+    }
+
+    h1 {
+      font-size: clamp(28px, 5vw, 42px);
+      margin-bottom: 30px;
+      text-align: center;
+      color: var(--primary-color);
+      font-weight: 700;
+      letter-spacing: -1px;
+      animation: slideUp 1.2s ease-out;
+      position: relative;
+    }
+
+    h1::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+      border-radius: 2px;
+      animation: fadeIn 2s ease-in-out;
+    }
+
+    .controls-wrapper {
+      width: 100%;
+      max-width: 2200px;
+      margin-bottom: 20px;
+    }
+
+    .controls-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .search-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .action-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #search-input {
+      padding: 12px 16px;
+      font-size: 16px;
+      border-radius: 12px;
+      border: 2px solid var(--glass-border);
+      flex: 1;
+      max-width: 400px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-light);
+      color: var(--primary-color);
+    }
+
+    #search-input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15), var(--shadow-medium);
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    #search-input::placeholder {
+      color: #6c757d;
+      font-weight: 400;
+    }
+
+    .btn {
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-light);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+      min-width: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--success-color), #229954);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #2ecc71, var(--success-color));
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #a80000, #c0392b);
+    }
+
+    .btn-danger:hover {
+      background: linear-gradient(135deg, #c0392b, #a80000);
+    }
+
+    /* .btn-success {
+      background: linear-gradient(135deg, #0ea50b, var(--success-color));
+    }
+
+    .btn-success:hover {
+      background: linear-gradient(135deg, var(--success-color), #0ea50b);
+    }
+
+    .btn-warning {
+      background: linear-gradient(135deg, var(--warning-color), #e67e22);
+    } */
+
+    /* .btn-info {
+      background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+    } */
+
+    .btn:disabled {
+      background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+      cursor: not-allowed;
+      opacity: 0.7;
+      transform: none;
+    }
+
+    .btn-icon {
+      font-size: 18px;
+      padding: 12px;
+      min-width: 44px;
+    }
+
+    #loading {
+      font-size: 16px;
+      margin-bottom: 15px;
+      display: block;
+      animation: fadeIn 1s ease-in-out;
+      color: var(--primary-color);
+      background: var(--glass-bg);
+      padding: 16px 24px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-light);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loading-shimmer {
+      background: linear-gradient(90deg, transparent, rgba(52, 152, 219, 0.2), transparent);
+      background-size: 200px 100%;
+      animation: shimmer 1.5s infinite;
+    }
+
+    .back-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: var(--glass-bg);
+      color: var(--primary-color);
+      border: none;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      animation: slideUp 1s ease-in-out;
+      padding: 12px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-light);
+      border: 1px solid var(--glass-border);
+      z-index: 100;
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .back-btn:hover {
+      transform: scale(1.1) translateY(-2px);
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: var(--shadow-medium);
+      color: var(--accent-color);
+    }
+
+    .table-container {
+      width: 100%;
+      max-width: 2200px;
+      overflow-x: auto;
+      max-height: 55vh;
+      border-radius: 16px;
+      box-shadow: var(--shadow-heavy);
+      animation: popIn 1s ease-in-out;
+      background: var(--glass-bg);
+      backdrop-filter: blur(15px);
+      border: 1px solid var(--glass-border);
+      position: relative;
+    }
+
+    .table-container::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    .table-container::-webkit-scrollbar-track {
+      background: rgba(44, 62, 80, 0.1);
+      border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 1200px;
+      user-select: text;
+    }
+
+    th, td {
+      border: 1px solid var(--glass-border);
+      padding: 12px 16px;
+      text-align: center;
+      color: var(--primary-color);
+      font-size: 13px;
+      transition: all 0.3s ease;
+    }
+
+    th {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+      color: #FFFFFF;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      font-size: 14px;
+      font-weight: 600;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    tbody tr {
+      transition: all 0.3s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(52, 152, 219, 0.08);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(248, 249, 250, 0.3);
+    }
+
+    tbody tr:nth-child(even):hover {
+      background: rgba(52, 152, 219, 0.12);
+    }
+
+    .submitbtn {
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--glass-bg);
+      border: 2px solid var(--glass-border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      margin: 2px;
+      min-width: 60px;
+      position: relative;
+      overflow: hidden;
+      background: green;
+      backdrop-filter: blur(10px);
+    }
+
+    .submitbtn:hover {
+      background: rgb(3, 182, 3);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(44, 62, 80, 0.2);
+      border-color: transparent;
+      color: white;
+    }
+
+    .submitbtn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .status {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 14px;
+      min-height: 20px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(44, 62, 80, 0.1);
+    }
+    .summary-section {
+      width: 100%;
+      max-width: 1400px;
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      animation: fadeIn 1.5s ease-in-out;
+    }
+
+    .summary-card {
+      background: var(--glass-bg);
+      padding: 20px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-light);
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .summary-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
+    }
+
+    .summary-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    }
+
+    .summary-label {
+      font-size: 14px;
+      color: #6c757d;
+      font-weight: 500;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .summary-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+
+    #bottom-summary {
+      width: 100%;
+      max-width: 2200px;
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 30rem;
+      animation: fadeIn 1.5s ease-in-out;
+    }
+
+    .left-summary, .right-summary {
+      background: var(--glass-bg);
+      padding: 16px 20px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-light);
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--primary-color);
+    }
+
+    .left-summary:hover, .right-summary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
+    }
+
+    .left-summary::before, .right-summary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    }
+
+    /* Modal Styles */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(44, 62, 80, 0.8);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    #confirmation-modal, #date-modal, #date-modal1 {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(44, 62, 80, 0.8);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    #confirmation-modal.show, #date-modal.show, #date-modal1.show {
+      display: flex;
+    }
+
+    .modal-content, #confirmation-box, #date-box, #date-modal > div, #date-modal1 > div {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 250, 0.95));
+      backdrop-filter: blur(20px);
+      padding: 30px 40px;
+      border-radius: 16px;
+      text-align: center;
+      animation: popIn 0.3s ease;
+      box-shadow: var(--shadow-heavy);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      min-width: 350px;
+      max-width: 500px;
+      position: relative;
+    }
+
+    .modal-title, #confirmation-text {
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+
+    .modal-buttons, .button-group {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      
+    }
+    #confirm-btn{background-color: #229954;}
+    #cancel-btn{background-color: #bd0000;}
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--primary-color);
+      font-size: 14px;
+    }
+
+    .form-input, #date-modal input, #date-modal1 input {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 2px solid var(--glass-border);
+      background: rgba(255, 255, 255, 0.9);
+      transition: all 0.3s ease;
+      color: var(--primary-color);
+    }
+
+    .form-input:focus, #date-modal input:focus, #date-modal1 input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+    }
+
+    /* Dropdown Styles */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 110%;
+      right: 0;
+      background: var(--glass-bg);
+      backdrop-filter: blur(15px);
+      min-width: 200px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-medium);
+      z-index: 100;
+      overflow: hidden;
+      border: 1px solid var(--glass-border);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .dropdown-content.show {
+      display: block;
+    }
+
+    .dropdown-content button {
+      background: none;
+      color: var(--primary-color);
+      padding: 12px 16px;
+      border: none;
+      text-align: left;
+      width: 100%;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .dropdown-content button:hover {
+      background: linear-gradient(135deg, rgba(44, 62, 80, 0.1), rgba(52, 152, 219, 0.1));
+      color: var(--accent-color);
+      transform: translateX(5px);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .controls-top {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-group {
+        min-width: unset;
+        width: 100%;
+      }
+
+      .action-group {
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .summary-section, #bottom-summary {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      }
+
+      .modal-content, #confirmation-box, #date-box, #date-modal > div, #date-modal1 > div {
+        margin: 20px;
+        min-width: unset;
+        max-width: calc(100vw - 40px);
+      }
+
+      th, td {
+        padding: 8px 12px;
+        font-size: 12px;
+      }
+
+      .back-btn {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+      }
+
+      .submitbtn {
+        padding: 4px 8px;
+        font-size: 11px;
+        min-width: 50px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button class="back-btn" onclick="goBack()" title="Go Back">←</button>
+  
+  <h1>Teacher Borrowing Records</h1>
+  
+  <div id="loading" class="loading-shimmer">Loading borrow data...</div>
+  <div id="status-msg" class="status"></div>
+
+  <div class="controls-wrapper">
+    <div class="controls-top">
+      <div class="search-group">
+        <input type="text" id="search-input" placeholder="🔍 Search by any field..." />
+        <button class="btn btn-warning btn-icon" id="calendar-btn" onclick="openDateModal1()" title="Select Date Range">
+          📅
+        </button>
+        <button class="btn btn-success btn-icon" id="refresh-button" onclick="fetchTeachers()" title="Refresh">
+          🔄️
+        </button>
+        <div class="dropdown">
+          <button class="btn btn-info btn-icon" id="download-button" title="Download">
+            ⬇️
+          </button>
+          <div class="dropdown-content">
+            <button onclick="downloadAll()">📊 Download All</button>
+            <button onclick="openDateModal()">📅 Download by Date Range</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="action-group">
+        <button class="btn btn-danger" id="dashboard-btn" onclick="bookIssue()">
+          📖 Issue New Book
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table id="borrow-table">
+      <thead>
+        <tr>
+          <th>Sl No</th>
+          <th>Book ID</th>
+          <th>Teacher ID</th>
+          <th>Teacher Name</th>
+          <th>Department</th>
+          <th>Book Name</th>
+          <th>Author</th>
+          <th>Published Year</th>
+          <th>Edition</th>
+          <th>Book Price</th>
+          <th>Issue Date</th>
+          <th>Borrow</th>
+          <th>Submit</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div id="bottom-summary">
+    <div class="left-summary">
+      <div class="summary-label">Total Records</div>
+      <div class="summary-value"><strong>Total:</strong> <span id="total-books">...</span></div>
+    </div>
+    <div class="right-summary">
+      <div class="summary-label">Status Overview</div>
+      <div class="summary-value">
+        <strong>Issued:</strong> <span id="Issued">...</span> | 
+        <strong>Submitted:</strong> <span id="Submitted">...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Custom Confirmation Modal -->
+  <div id="confirmation-modal">
+    <div id="confirmation-box">
+      <p id="confirmation-text">Are you sure?</p>
+      <div class="button-group">
+        <button id="confirm-btn" class="btn btn-success">✓ Yes</button>
+        <button id="cancel-btn" class="btn btn-danger">✗ Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATE RANGE MODAL -->
+  <div id="date-modal">
+    <div>
+      <h3>Select Date Range</h3>
+      <div class="form-group">
+        <label class="form-label">From:</label>
+        <input type="date" id="start-date" class="form-input">
+      </div>
+      <div class="form-group">
+        <label class="form-label">To:</label>
+        <input type="date" id="end-date" class="form-input">
+      </div>
+      <div class="modal-buttons">
+        <button onclick="confirmDateDownload()" class="btn btn-primary">📥 Download</button>
+        <button onclick="closeDateModal()" class="btn btn-danger">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Date Range Modal -->
+  <div id="date-modal1">
+    <div>
+      <h3>Select Date Range</h3>
+      <div class="form-group">
+        <label class="form-label">From:</label>
+        <input type="date" id="start-date1" class="form-input">
+      </div>
+      <div class="form-group">
+        <label class="form-label">To:</label>
+        <input type="date" id="end-date1" class="form-input">
+      </div>
+      <div class="modal-buttons">
+        <button onclick="applyDateFilter()" class="btn btn-primary">🔍 Apply</button>
+        <button onclick="closeDateModal1()" class="btn btn-danger">Cancel</button>
+      </div>
+    </div>
+  </div>
+  <script>
+  function showMessage(message, color = "green") {
+    const msgBox = document.getElementById("status-msg");
+    msgBox.textContent = message;
+    msgBox.style.color = color;
+    setTimeout(() => {
+      msgBox.textContent = "";
+    }, 5000);
+  }
+
+  let allBorrowData = [];
+  let firstLoadComplete = false;
+  let borrowInterval;
+
+  async function fetchTeacherBorrowRegister() {
+    const loadingText = document.getElementById("loading");
+
+    if (!window.pywebview || !window.pywebview.api) {
+      console.warn("PyWebView API unavailable.");
+      return;
+    }
+
+    if (!firstLoadComplete) {
+      loadingText.style.display = "block";
+      loadingText.textContent = "Loading borrow data...";
+    }
+
+    try {
+      const borrowList = await window.pywebview.api.fetchteacherborrowregister();
+      await fetchSummary();
+
+      if (JSON.stringify(borrowList) !== JSON.stringify(allBorrowData)) {
+        allBorrowData = borrowList;
+        renderBorrowTable(borrowList);
+      }
+
+      if (!firstLoadComplete) {
+        loadingText.style.display = "none";
+        firstLoadComplete = true;
+        borrowInterval = setInterval(fetchTeacherBorrowRegister, 10000);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      showMessage(error, "red");
+      loadingText.textContent = "❌ Failed to load data.";
+    }
+  }
+
+  function renderBorrowTable(data) {
+    const table = document.getElementById("borrow-table").getElementsByTagName("tbody")[0];
+    while (table.rows.length > 0) table.deleteRow(0);
+
+    data.forEach(entry => {
+      const row = table.insertRow();
+      row.innerHTML = `
+        <td>${entry.Sl_No}</td>
+        <td>${entry.Book_ID}</td>
+        <td>${entry.Teacher_ID}</td>
+        <td>${entry.Teacher_Name}</td>
+        <td>${entry.Department}</td>
+        <td>${entry.Book_Name}</td>
+        <td>${entry.Author}</td>
+        <td>${entry.Published_Year}</td>
+        <td>${entry.Edition}</td>
+        <td>${entry.Book_Price}</td>
+        <td>${entry.Borrow_Date}</td>
+        <td>${entry.Borrow == 1 ? "✅" : ""}</td>
+        <td>${entry.Submit == 1 ? "✅" : ""}</td>
+        <td>
+          ${
+            entry.Borrow == 1
+              ? `<button class="submitbtn" onclick="submitBook('${entry.Book_ID}', '${entry.Teacher_ID}', this)">Submit</button>`
+              : `<span style="color: gray;"></span>`
+          }
+        </td>
+      `;
+    });
+  }
+
+  async function fetchSummary() {
+    try {
+      const stats = await window.pywebview.api.total_teacher_issued();
+      document.getElementById("total-books").textContent = stats.total;
+      document.getElementById("Issued").textContent = stats.issue;
+      document.getElementById("Submitted").textContent = stats.submit;
+    } catch (error) {
+      console.error("Summary fetch failed:", error);
+      document.getElementById("total-books").textContent = "❌";
+      document.getElementById("Issued").textContent = "❌";
+      document.getElementById("Submitted").textContent = "❌";
+    }
+  }
+
+  document.getElementById("search-input").addEventListener("input", function () {
+    const searchValue = this.value.toLowerCase();
+    const filtered = allBorrowData.filter(entry =>
+      Object.values(entry).some(value =>
+        String(value).toLowerCase().includes(searchValue)
+      )
+    );
+    renderBorrowTable(filtered);
+  });
+
+
+  function goBack() {
+    if (window.pywebview && window.pywebview.api) {
+      window.pywebview.api.go_back();
+    } else {
+      showMessage("❌ Unable to go back.", "red");
+    }
+  }
+
+ // Toggle dropdown
+    document.getElementById("download-button").addEventListener("click", function(e){
+      e.stopPropagation();
+      document.querySelector(".dropdown-content").classList.toggle("show");
+    });
+    window.addEventListener("click", function(){
+      const dropdown = document.querySelector(".dropdown-content");
+      if(dropdown.classList.contains("show")) dropdown.classList.remove("show");
+    });
+
+    function openDateModal() {
+      document.getElementById("date-modal").style.display = "flex";
+    }
+    function closeDateModal() {
+      document.getElementById("date-modal").style.display = "none";
+    }
+    /* Download Button Logic */
+    function openDateRangeModal() { document.getElementById("date-modal").style.display = "flex"; }
+    function closeDateModal() { document.getElementById("date-modal").style.display = "none"; }
+
+    async function confirmDateDownload() {
+      const startDate = document.getElementById("start-date").value;
+      const endDate = document.getElementById("end-date").value;
+      if (!startDate || !endDate) { showMessage("⚠️ Please select both dates.", "orange"); return; }
+      closeDateModal();
+      triggerDownload(startDate, endDate);
+    }
+
+    async function downloadAll() { triggerDownload(); }
+
+    async function triggerDownload(startDate = null, endDate = null) {
+      const btn = document.getElementById("download-button");
+      btn.disabled = true;
+      const originalText = btn.textContent;
+      btn.textContent = "⌛";
+
+      try {
+        const result = await window.pywebview.api.download(startDate, endDate );
+        if (result === true) {
+          if (startDate && endDate) showMessage(`✅ Downloaded records from ${startDate} to ${endDate}`, "green");
+          else showMessage("✅ Downloaded full borrow list!", "green");
+        } else {
+          showMessage("❌ Error downloading list", "red");
+        }
+      } catch (e) {
+        console.error("Download failed:", e);
+        showMessage("❌ An error occurred", "red");
+      } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }
+    }
+
+    function openDateModal1() {
+  document.getElementById("date-modal1").style.display = "flex"; // Show modal
+}
+
+function closeDateModal1() {
+  document.getElementById("date-modal1").style.display = "none"; // Close modal
+}
+
+function applyDateFilter() {
+  const start = document.getElementById("start-date1").value;
+  const end = document.getElementById("end-date1").value;
+
+  if (!start || !end) {
+    showMessage("⚠️ Please select both dates!", "red");
+    return;
+  }
+
+  const filtered = allBorrowData.filter(entry => {
+    const dateStr = entry.Borrow_Date;
+    let borrowDate;
+
+    // Handle date format conversion if necessary
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      borrowDate = new Date(dateStr);
+    } else if (/^\d{2}-\d{2}-\d{4}$/.test(dateStr)) {
+      const parts = dateStr.split("-");
+      borrowDate = new Date(parts[2], parts[1] - 1, parts[0]);
+    } else {
+      return false; // skip invalid dates
+    }
+
+    return borrowDate >= new Date(start) && borrowDate <= new Date(end);
+  });
+
+  renderBorrowTable(filtered);
+  closeDateModal1(); // Close modal after applying filter
+}
+
+function resetDateFilter() {
+  document.getElementById("start-date1").value = "";
+  document.getElementById("end-date1").value = "";
+  renderBorrowTable(allBorrowData);
+}
+
+  function bookIssue() {
+    window.pywebview.api.issue_teacher_book();
+  }
+
+  let pendingAction = null;
+
+  function confirmAction(text, callback) {
+    document.getElementById("confirmation-text").textContent = text;
+    document.getElementById("confirmation-modal").style.display = "flex";
+    pendingAction = callback;
+  }
+
+  document.getElementById("confirm-btn").addEventListener("click", () => {
+    if (pendingAction) pendingAction();
+    document.getElementById("confirmation-modal").style.display = "none";
+  });
+
+  document.getElementById("cancel-btn").addEventListener("click", () => {
+    document.getElementById("confirmation-modal").style.display = "none";
+    pendingAction = null;
+  });
+
+  async function submitBook(bookid, teacherid, button) {
+    confirmAction(`Submit book "${bookid}" for Teacher ID "${teacherid}"?`, async () => {
+      const originalText = button.innerHTML;
+      button.disabled = true;
+      button.innerHTML = `⌛`;
+
+      try {
+        const res = await window.pywebview.api.submit_teacher_book({ bookid, teacherid });
+
+        if (res.success === true) {
+          showMessage(`✅ Book "${bookid}" submitted by Teacher "${teacherid}".`, "green");
+          fetchTeacherBorrowRegister();
+        } else if (res.status === "error") {
+          showMessage(`❗ ${res.reason}`, "red");
+        } else if (res === false) {
+          showMessage(`❌ No borrow record found for Book ID "${bookid}" and Teacher ID "${teacherid}".`, "red");
+        } else {
+          showMessage("⚠ Submission failed.", "red");
+        }
+      } catch (err) {
+        console.error("Submission error:", err);
+        showMessage("❌ Failed to connect to service.", "red");
+      } finally {
+        button.disabled = false;
+        button.innerHTML = originalText;
+      }
+    });
+  }
+
+
+
+    setInterval(fetchTeacherBorrowRegister, 1000);
+  </script>
+</body>
+</html>

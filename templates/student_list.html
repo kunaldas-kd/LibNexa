@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student List</title>
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%);
+      color: #2C3E50;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      animation: fadeIn 1.5s ease-in-out;
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      user-select: text;
+    }
+
+    /* Processing Overlay */
+    #processing-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(44, 62, 80, 0.8);
+      backdrop-filter: blur(10px);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+    }
+
+    #processing-overlay .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid #ffffff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    #processing-text {
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 42px;
+      margin-bottom: 30px;
+      text-align: center;
+      color: #2C3E50;
+      text-shadow: 0 2px 8px rgba(44, 62, 80, 0.2);
+      font-weight: 700;
+      letter-spacing: -1px;
+      animation: slideUp 1.2s ease-out;
+      background: linear-gradient(45deg, #2C3E50, #34495e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    #search-container {
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: flex-start;
+      width: 100%;
+      gap: 10px;
+      animation: fadeIn 1.8s ease-in-out;
+    }
+
+    #search-container1 {
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      gap: 10px;
+      animation: fadeIn 2s ease-in-out;
+    }
+
+    #search-input {
+      padding: 12px 16px;
+      font-size: 16px;
+      border-radius: 12px;
+      border: 2px solid rgba(44, 62, 80, 0.2);
+      width: 350px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
+      color: #2C3E50;
+    }
+
+    #search-input:focus {
+      outline: none;
+      border-color: #2C3E50;
+      box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.15), 0 4px 20px rgba(44, 62, 80, 0.2);
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    #search-input::placeholder {
+      color: rgba(44, 62, 80, 0.6);
+    }
+
+    #dashboard-btn1,
+    #dashboard-btn,
+    #refresh-button,
+    #download-button {
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    #dashboard-btn { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+    #dashboard-btn1 { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+
+    #dashboard-btn:hover,
+    #dashboard-btn1:hover,
+    #refresh-button:hover,
+    #download-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(44, 62, 80, 0.4);
+    }
+
+    #dashboard-btn:active,
+    #dashboard-btn1:active,
+    #refresh-button:active,
+    #download-button:active {
+      transform: translateY(0px);
+    }
+
+    #download-button:disabled {
+      background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      max-height: 70vh;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(44, 62, 80, 0.15);
+      animation: popIn 1s ease-in-out;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(44, 62, 80, 0.1);
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      user-select: text;
+    }
+
+    th, td {
+      border: 1px solid rgba(44, 62, 80, 0.1);
+      padding: 12px 16px;
+      text-align: center;
+      color: #2C3E50;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      user-select: text;
+    }
+
+    th {
+      background: linear-gradient(135deg, #2C3E50, #34495e);
+      color: #FFFFFF;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      font-size: 16px;
+      font-weight: 600;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    tbody tr {
+      transition: all 0.3s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(44, 62, 80, 0.08);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.15);
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(248, 249, 250, 0.7);
+    }
+
+    #loading {
+      font-size: 16px;
+      margin-bottom: 15px;
+      display: block;
+      animation: fadeIn 1s ease-in-out;
+      color: #2C3E50;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 12px 20px;
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(44, 62, 80, 0.1);
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
+    }
+
+    .back-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #2C3E50;
+      border: none;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      animation: slideUp 1s ease-in-out;
+      padding: 10px 12px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
+      border: 1px solid rgba(44, 62, 80, 0.1);
+    }
+
+    .back-btn:hover {
+      transform: scale(1.1) translateY(-2px);
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 6px 20px rgba(44, 62, 80, 0.2);
+      color: #34495e;
+    }
+
+    #total-students {
+      width: 100%;
+      text-align: right;
+      margin-top: 15px;
+      font-weight: 600;
+      font-size: 18px;
+      color: #2C3E50;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(44, 62, 80, 0.1);
+      animation: fadeIn 1s ease-in-out;
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
+    }
+
+    .status {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 14px;
+      min-height: 20px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(44, 62, 80, 0.1);
+    }
+
+    .library-clearance-btn {
+      padding: 6px 10px;
+      background-color: #a80000;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    /* Edit button styling */
+    .edit-btn {
+      padding: 6px 10px;
+      background: linear-gradient(135deg, #3498db, #2980b9);
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-right: 5px;
+    }
+
+    .edit-btn:hover {
+      background: linear-gradient(135deg, #2980b9, #21618c);
+      transform: translateY(-1px);
+    }
+
+    .save-btn,
+    .cancel-edit-btn {
+      justify-content: space-between; /* or flex if they're full width */
+      gap: 6px; /* small space between buttons */
+      align-items: center;
+      padding: 6px 10px;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 16px;
+    }
+
+    /* Save Button */
+    .save-btn {
+      background: linear-gradient(135deg, #27ae5f00, #22995400);
+    }
+
+    .save-btn:hover {
+      /* background: linear-gradient(135deg, #229954, #1e8449); */
+      transform: translateY(-1px);
+    }
+
+    /* Cancel Button */
+    .cancel-edit-btn {
+      background: linear-gradient(135deg, #e74d3c00, #c03a2b00);
+    }
+
+    .cancel-edit-btn:hover {
+      /* background: linear-gradient(135deg, #c0392b, #a93226); */
+      transform: translateY(-1px);
+    }
+
+    /* Editable input styling */
+    .editable-input {
+      border: 2px solid #3498db;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 14px;
+      color: #2C3E50;
+      width: 100%;
+      box-shadow: 0 2px 8px rgba(52, 152, 219, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .editable-input:focus {
+      outline: none;
+      border-color: #2980b9;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+
+    /* Special styling for Student ID input (indicating it's editable but important) */
+    .editable-input[data-field="Student_ID"] {
+      border-color: #f39c12;
+      background: rgba(243, 156, 18, 0.1);
+    }
+
+    .editable-input[data-field="Student_ID"]:focus {
+      border-color: #e67e22;
+      box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.2);
+    }
+
+    /* Modal styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(44, 62, 80, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: #fff;
+      padding: 25px 20px;
+      border-radius: 10px;
+      width: 350px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(44, 62, 80, 0.2);
+      animation: popIn 0.3s ease-out;
+    }
+
+    .modal-content h2 {
+      margin-bottom: 10px;
+      font-size: 20px;
+      color: #2C3E50;
+    }
+
+    .modal-content p {
+      font-size: 16px;
+      margin-bottom: 20px;
+      color: #2C3E50;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .confirm-btn, .cancel-btn {
+      padding: 8px 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .confirm-btn {
+      background-color: #258400;
+      color: #fff;
+    }
+
+    .cancel-btn {
+      background-color: #a80000;
+      color: #fff;
+    }
+
+    /* Dropdown styling */
+    #refresh-button, #download-button, #calendar-btn {
+      padding: 12px 14px;
+      font-size: 20px;
+      font-weight: 600;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 110%;
+      right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      min-width: 250px;
+      border-radius: 12px;
+      box-shadow: 0 15px 35px rgba(44, 62, 80, 0.2);
+      z-index: 10;
+      overflow: hidden;
+      border: 1px solid rgba(44, 62, 80, 0.2);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .dropdown-content button {
+      background: none;
+      color: #2C3E50;
+      padding: 12px 16px;
+      border: none;
+      text-align: left;
+      width: 100%;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .dropdown-content button:hover {
+      background: rgba(44, 62, 80, 0.1);
+      color: #2C3E50;
+      transform: translateX(5px);
+    }
+
+    .dropdown-content.show {
+      display: block;
+    }
+
+    /* Modal styling */
+    .filter-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(50, 80, 44, 0.6);
+      backdrop-filter: blur(8px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .filter-modal > div {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 250, 0.95));
+      backdrop-filter: blur(20px);
+      padding: 30px 40px;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(44, 62, 80, 0.3);
+      min-width: 350px;
+      text-align: center;
+      animation: popIn 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .filter-modal h3 {
+      margin-bottom: 20px;
+      color: #2C3E50;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .filter-modal input, .filter-modal select {
+      padding: 12px 16px;
+      margin: 15px 0;
+      font-size: 14px;
+      border: 2px solid rgba(44, 62, 80, 0.3);
+      border-radius: 8px;
+      width: 85%;
+      background: rgba(255, 255, 255, 0.9);
+      transition: all 0.3s ease;
+      color: #2C3E50;
+    }
+
+    .filter-modal input:focus, .filter-modal select:focus {
+      outline: none;
+      border-color: #2C3E50;
+      box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.2);
+    }
+
+    .filter-modal button {
+      padding: 12px 24px;
+      margin: 15px 8px 0 8px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+      min-width: 100px;
+      transition: all 0.3s ease;
+    }
+
+    .filter-modal button:first-of-type {
+      background: linear-gradient(135deg, #098b14, #0bb63f);
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.3);
+    }
+
+    .filter-modal button:first-of-type:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(44, 62, 80, 0.4);
+    }
+
+    .filter-modal button:last-of-type {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+    }
+
+    .filter-modal button:last-of-type:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+    }
+
+    /* Submit button styling */
+    .submitbtn {
+      background: linear-gradient(135deg, #9b59b6, #8e44ad);
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 10px rgba(44, 62, 80, 0.3);
+    }
+
+    .submitbtn:hover {
+      background: linear-gradient(135deg, #8e44ad, #7d3c98);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(44, 62, 80, 0.4);
+    }
+
+    .submitbtn:active {
+      transform: translateY(0px);
+    }
+
+    .disabled-btn {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    /* Warning message for Student ID editing */
+    .edit-warning {
+      background: rgba(243, 156, 18, 0.1);
+      border: 1px solid #f39c12;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 10px 0;
+      color: #e67e22;
+      font-size: 14px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <!-- Processing Overlay -->
+  <div id="processing-overlay">
+    <div class="spinner"></div>
+    <div id="processing-text">Processing...</div>
+  </div>
+
+  <button class="back-btn" onclick="goBack()">←</button>
+  <h1>Student Directory</h1>
+  <div id="loading">Loading student data...</div>
+  <div id="status-msg" class="status"></div>
+  <div id="search-container">
+    <input type="text" id="search-input" placeholder="Search by any field..." />
+    <button id="refresh-button" onclick="fetchStudent()" title="Refresh">🔄️</button>
+    <div class="dropdown">
+      <button id="download-button" title="Download">⬇️</button>
+      <div class="dropdown-content">
+        <button onclick="downloadAll()">Download All</button><hr>
+        <button onclick="openFilterModal('Department-modal')">By Department</button>
+        <button onclick="openFilterModal('Admission_Year-modal')">By Admission Year</button>
+      </div>
+    </div>
+
+    <div id="search-container1">
+      <button id="dashboard-btn" onclick="openStudentEntry()">+ Add Student</button>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table id="student-table">
+      <thead>
+        <tr>
+          <th>Student ID</th>
+          <th>Student Name</th>
+          <th>Date of Birth</th>
+          <th>Department</th>
+          <th>Student Email</th>
+          <th>Phone Number</th>
+          <th>Address</th>
+          <th>Admission Year</th>
+          <th>Library Clearance</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+    </table>
+  </div>
+
+  <div id="total-students">🎓 Total Students: 0</div>
+  
+  <!-- Edit Confirmation Modal -->
+  <div id="edit-confirmation-modal" style="display:none;" class="modal-overlay">
+    <div class="modal-content">
+      <h2>Confirm Edit</h2>
+      <p id="edit-confirmation-text">Are you sure you want to edit this student's information?</p>
+      <div class="edit-warning">
+        ⚠️ <strong>Warning:</strong> You can edit the Student ID, but be very careful as this is a unique identifier. Changing it may affect system references.
+      </div>
+      <div class="modal-buttons">
+        <button id="confirm-edit" class="confirm-btn">Yes, Edit</button>
+        <button id="cancel-edit" class="cancel-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Library Clearance Confirmation Modal -->
+  <div id="confirmation-modal" style="display:none;" class="modal-overlay">
+    <div class="modal-content">
+      <h2>Confirm Clearance</h2>
+      <p id="confirmation-text">Are you sure you want to clear this student?</p>
+      <div class="modal-buttons">
+        <button id="confirm-clearance" class="confirm-btn">Yes</button>
+        <button id="cancel-clearance" class="cancel-btn">No</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Filter Modals for Students -->
+  <div id="Department-modal" class="filter-modal">
+    <div>
+      <h3>Filter by Department</h3>
+      <input type="text" id="filter-department" placeholder="Enter Department">
+      <button onclick="confirmFilterDownload('Department')">Download</button>
+      <button onclick="closeFilterModal('Department-modal')">Cancel</button>
+    </div>
+  </div>
+
+  <div id="Admission_Year-modal" class="filter-modal">
+    <div>
+      <h3>Filter by Admission Year</h3>
+      <input type="number" id="filter-year" placeholder="Enter Admission Year">
+      <button onclick="confirmFilterDownload('Admission_Year')">Download</button>
+      <button onclick="closeFilterModal('Admission_Year-modal')">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    let isProcessing = false;
+
+    function setProcessingState(isActive, message = "Processing...") {
+      isProcessing = isActive;
+      const overlay = document.getElementById("processing-overlay");
+      const processingText = document.getElementById("processing-text");
+      
+      if (isActive) {
+        processingText.textContent = message;
+        overlay.style.display = "flex";
+        disableAllButtons();
+      } else {
+        overlay.style.display = "none";
+        enableAllButtons();
+      }
+    }
+
+    function disableAllButtons() {
+      // Main action buttons
+      document.getElementById("refresh-button").disabled = true;
+      document.getElementById("download-button").disabled = true;
+      document.getElementById("dashboard-btn").disabled = true;
+      document.querySelector(".back-btn").disabled = true;
+
+      // Dropdown buttons
+      const dropdownButtons = document.querySelectorAll(".dropdown-content button");
+      dropdownButtons.forEach(btn => btn.disabled = true);
+
+      // Table action buttons
+      const editButtons = document.querySelectorAll(".edit-btn");
+      editButtons.forEach(btn => btn.disabled = true);
+
+      const libraryButtons = document.querySelectorAll(".library-clearance-btn");
+      libraryButtons.forEach(btn => btn.disabled = true);
+
+      const saveButtons = document.querySelectorAll(".save-btn");
+      saveButtons.forEach(btn => btn.disabled = true);
+
+      const cancelButtons = document.querySelectorAll(".cancel-edit-btn");
+      cancelButtons.forEach(btn => btn.disabled = true);
+
+      // Modal buttons
+      const modalButtons = document.querySelectorAll(".confirm-btn, .cancel-btn");
+      modalButtons.forEach(btn => btn.disabled = true);
+
+      // Filter modal buttons
+      const filterButtons = document.querySelectorAll(".filter-modal button");
+      filterButtons.forEach(btn => btn.disabled = true);
+    }
+
+    function enableAllButtons() {
+      // Main action buttons
+      document.getElementById("refresh-button").disabled = false;
+      document.getElementById("download-button").disabled = false;
+      document.getElementById("dashboard-btn").disabled = false;
+      document.querySelector(".back-btn").disabled = false;
+
+      // Dropdown buttons
+      const dropdownButtons = document.querySelectorAll(".dropdown-content button");
+      dropdownButtons.forEach(btn => btn.disabled = false);
+
+      // Table action buttons
+      const editButtons = document.querySelectorAll(".edit-btn");
+      editButtons.forEach(btn => btn.disabled = false);
+
+      const libraryButtons = document.querySelectorAll(".library-clearance-btn:not([data-cleared])");
+      libraryButtons.forEach(btn => btn.disabled = false);
+
+      const saveButtons = document.querySelectorAll(".save-btn");
+      saveButtons.forEach(btn => btn.disabled = false);
+
+      const cancelButtons = document.querySelectorAll(".cancel-edit-btn");
+      cancelButtons.forEach(btn => btn.disabled = false);
+
+      // Modal buttons
+      const modalButtons = document.querySelectorAll(".confirm-btn, .cancel-btn");
+      modalButtons.forEach(btn => btn.disabled = false);
+
+      // Filter modal buttons
+      const filterButtons = document.querySelectorAll(".filter-modal button");
+      filterButtons.forEach(btn => btn.disabled = false);
+    }
+
+    async function showMessage(message, color = "green") {
+      const msgBox = document.getElementById("status-msg");
+      msgBox.textContent = message;
+      msgBox.style.color = color;
+      setTimeout(() => {
+        msgBox.textContent = "";
+      }, 5000);
+    }
+
+    let allStudents = [];
+    let firstLoadComplete = false;
+    let studentInterval;
+    let selectedStudentId = null;
+    let editingRowId = null;
+    let originalRowData = {};
+
+    async function fetchStudent() {
+      const loadingText = document.getElementById("loading");
+
+      if (!firstLoadComplete) {
+        loadingText.style.display = "block";
+        loadingText.textContent = "Loading student data...";
+      }
+
+      try {
+        const api = window.pywebview.api;
+        const students = await api.fetchstudents();
+
+        if (JSON.stringify(students) !== JSON.stringify(allStudents)) {
+          allStudents = students;
+          renderStudentTable(students);
+          await updateTotalStudents();
+        }
+
+        if (!firstLoadComplete) {
+          loadingText.style.display = "none";
+          firstLoadComplete = true;
+          studentInterval = setInterval(fetchStudent, 10000);
+        }
+      } catch (error) {
+        console.error("Error fetching students:", error);
+      }
+    }
+
+    async function renderStudentTable(students) {
+      const table = document.getElementById("student-table");
+      while (table.rows.length > 1) {
+        table.deleteRow(1);
+      }
+
+      students.forEach(student => {
+        const row = table.insertRow();
+        row.setAttribute('data-student-id', student.Student_ID);
+        row.innerHTML = `
+          <td data-field="Student_ID">${student.Student_ID}</td>
+          <td data-field="Student_Name">${student.Student_Name}</td>
+          <td data-field="Date_Of_Birth">${student.Date_Of_Birth}</td>
+          <td data-field="Department">${student.Department}</td>
+          <td data-field="Student_Email">${student.Student_Email}</td>
+          <td data-field="Phone_Number">${student.Phone_Number}</td>
+          <td data-field="Address">${student.Address}</td>
+          <td data-field="Admission_Year">${student.Admission_Year}</td>
+          <td><button class="library-clearance-btn" data-id="${student.Student_ID}" onclick="clearStudentLibrary('${student.Student_ID}')">📄</button></td>
+          <td class="actions-cell">
+            <button class="edit-btn" onclick="confirmEdit('${student.Student_ID}')" title="Edit Student">✏️</button>
+          </td>
+        `;
+      });
+    }
+
+    async function confirmEdit(studentId) {
+      selectedStudentId = studentId;
+      document.getElementById("edit-confirmation-text").textContent =
+        `Are you sure you want to edit Student ID: ${studentId}?`;
+      document.getElementById("edit-confirmation-modal").style.display = "flex";
+    }
+
+    async function enableEdit(studentId) {
+      if (editingRowId !== null) {
+        showMessage("Please finish editing the current row first.", "orange");
+        return;
+      }
+
+      editingRowId = studentId;
+      const row = document.querySelector(`tr[data-student-id="${studentId}"]`);
+      if (!row) return;
+
+      // Store original data
+      originalRowData = {};
+      const cells = row.querySelectorAll('td[data-field]');
+      cells.forEach(cell => {
+        const field = cell.getAttribute('data-field');
+        originalRowData[field] = cell.textContent;
+        
+        // Now include Student_ID as editable too
+        const input = document.createElement('input');
+        input.className = 'editable-input';
+        input.value = cell.textContent;
+        input.setAttribute('data-field', field);
+        
+        // Special handling for different field types
+        if (field === 'Student_ID') {
+          input.type = 'text';
+          input.placeholder = 'Enter unique Student ID';
+          // Add a title/tooltip for Student ID
+          input.title = 'Warning: Changing Student ID may affect system references';
+        } else if (field === 'Date_Of_Birth') {
+          input.type = 'date';
+        } else if (field === 'Student_Email') {
+          input.type = 'email';
+        } else if (field === 'Phone_Number') {
+          input.type = 'tel';
+        } else if (field === 'Admission_Year') {
+          input.type = 'number';
+          input.min = '1900';
+          input.max = new Date().getFullYear();
+        }
+        
+        cell.innerHTML = '';
+        cell.appendChild(input);
+      });
+
+      // Replace edit button with save and cancel buttons
+      const actionsCell = row.querySelector('.actions-cell');
+      actionsCell.innerHTML = `
+        <button class="save-btn" onclick="saveEdit('${studentId}')" title="Save Changes">💾</button>
+        <button class="cancel-edit-btn" onclick="cancelEdit('${studentId}')" title="Cancel Edit">❌</button>
+      `;
+    }
+
+    async function saveEdit(originalStudentId) {
+      setProcessingState(true, "Saving changes...");
+      
+      const row = document.querySelector(`tr[data-student-id="${originalStudentId}"]`);
+      if (!row) {
+        setProcessingState(false);
+        return;
+      }
+
+      // Collect new data
+      const newData = {};
+      const inputs = row.querySelectorAll('.editable-input');
+      
+      inputs.forEach(input => {
+        const field = input.getAttribute('data-field');
+        newData[field] = input.value.trim();
+      });
+
+      // Validate required fields
+      const requiredFields = ['Student_ID', 'Student_Name', 'Department', 'Student_Email'];
+      for (let field of requiredFields) {
+        if (!newData[field]) {
+          showMessage(`${field.replace('_', ' ')} is required.`, "red");
+          setProcessingState(false);
+          return;
+        }
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (newData.Student_Email && !emailRegex.test(newData.Student_Email)) {
+        showMessage("Please enter a valid email address.", "red");
+        setProcessingState(false);
+        return;
+      }
+
+      // Check if Student_ID changed and validate uniqueness
+      if (newData.Student_ID !== originalStudentId) {
+        const existingStudent = allStudents.find(student => 
+          student.Student_ID === newData.Student_ID && student.Student_ID !== originalStudentId
+        );
+        if (existingStudent) {
+          showMessage("Student ID already exists. Please choose a different ID.", "red");
+          setProcessingState(false);
+          return;
+        }
+      }
+
+      try {
+        // Call API to update student - pass both original and new student ID
+        const result = await window.pywebview.api.update_student(newData, originalStudentId);
+        
+        if (result && result.success) {
+          showMessage(`✅ Student ${originalStudentId} updated successfully!`, "green");
+          
+          // Update the row with new data
+          inputs.forEach(input => {
+            const field = input.getAttribute('data-field');
+            const cell = input.parentNode;
+            cell.textContent = newData[field];
+          });
+
+          // Update the row's data-student-id attribute if Student_ID changed
+          if (newData.Student_ID !== originalStudentId) {
+            row.setAttribute('data-student-id', newData.Student_ID);
+          }
+
+          // Reset actions buttons with new student ID
+          const actionsCell = row.querySelector('.actions-cell');
+          actionsCell.innerHTML = `
+            <button class="edit-btn" onclick="confirmEdit('${newData.Student_ID}')" title="Edit Student">✏️</button>
+          `;
+
+          editingRowId = null;
+          originalRowData = {};
+          
+          // Refresh data to ensure consistency
+          setTimeout(() => fetchStudent(), 1000);
+        } else {
+          throw new Error(result.message || "Update failed");
+        }
+      } catch (error) {
+        console.error("Error updating student:", error);
+        showMessage(`❌ Error updating student: ${error.message}`, "red");
+      } finally {
+        setProcessingState(false);
+      }
+    }
+
+    async function cancelEdit(studentId) {
+      const row = document.querySelector(`tr[data-student-id="${studentId}"]`);
+      if (!row) return;
+
+      // Restore original data
+      const cells = row.querySelectorAll('td[data-field]');
+      cells.forEach(cell => {
+        const field = cell.getAttribute('data-field');
+        if (originalRowData[field] !== undefined) {
+          cell.textContent = originalRowData[field];
+        }
+      });
+
+      // Reset actions buttons
+      const actionsCell = row.querySelector('.actions-cell');
+      actionsCell.innerHTML = `
+        <button class="edit-btn" onclick="confirmEdit('${studentId}')" title="Edit Student">✏️</button>
+      `;
+
+      editingRowId = null;
+      originalRowData = {};
+      showMessage("Edit cancelled.", "orange");
+    }
+
+    async function updateTotalStudents() {
+      try {
+        const count = await window.pywebview.api.total_student();
+        document.getElementById("total-students").textContent = `📊 Total Students: ${count}`;
+      } catch (error) {
+        console.error("Error fetching total student count:", error);
+        document.getElementById("total-students").textContent = "📊 Total Students: ❌";
+      }
+    }
+
+    async function filterStudents() {
+      const searchValue = document.getElementById("search-input").value.toLowerCase();
+      const filtered = allStudents.filter(student =>
+        Object.values(student).some(value =>
+          String(value).toLowerCase().includes(searchValue)
+        )
+      );
+      renderStudentTable(filtered);
+    }
+
+    document.getElementById("search-input").addEventListener("input", filterStudents);
+
+    async function goBack() {
+      setProcessingState(true, "Navigating back...");
+      try {
+        if (window.pywebview && window.pywebview.api) {
+          await window.pywebview.api.go_back();
+        } else {
+          showMessage("❌ Unable to go back.", "red");
+        }
+      } finally {
+        setProcessingState(false);
+      }
+    }
+
+    // Dropdown toggle
+    document.getElementById("download-button").addEventListener("click", e => {
+      e.stopPropagation();
+      document.querySelector(".dropdown-content").classList.toggle("show");
+    });
+    window.addEventListener("click", () => {
+      const d = document.querySelector(".dropdown-content");
+      if (d.classList.contains("show")) d.classList.remove("show");
+    });
+
+    function openFilterModal(id) { document.getElementById(id).style.display = "flex"; }
+    function closeFilterModal(id) { document.getElementById(id).style.display = "none"; }
+
+    async function confirmFilterDownload(type) {
+      let val = "";
+      let modalId = "";
+      if (type === "Department") {
+        val = document.getElementById("filter-department").value;
+        modalId = "Department-modal";
+        await triggerDownload(val, null);
+      } else if (type === "Admission_Year") {
+        val = document.getElementById("filter-year").value;
+        modalId = "Admission_Year-modal";
+        await triggerDownload(null, val);
+      }
+      clear();
+      closeFilterModal(modalId);
+    }
+
+    async function downloadAll() { await triggerDownload(); }
+
+    async function triggerDownload(Department = null, Admission_Year = null) {
+      setProcessingState(true, "Preparing download...");
+
+      try {
+        const res = await window.pywebview.api.download(Department, Admission_Year);
+        if (res) {
+          if (Department || Admission_Year) showMessage("✅ Downloaded filtered students", "green");
+          else showMessage("✅ Downloaded full student list", "green");
+        } else {
+          showMessage("❌ Error downloading", "red");
+        }
+      } catch (e) {
+        console.error(e);
+        alert(`${e}`)
+        showMessage("❌ An error occurred", "red");
+      } finally {
+        setProcessingState(false);
+      }
+    }
+
+    function clear() {
+      document.getElementById("filter-department").value = "";
+      document.getElementById("filter-year").value = "";
+    }
+
+    async function openStudentEntry() {
+      setProcessingState(true, "Opening student entry form...");
+      try {
+        await window.pywebview.api.open_student_entry();
+      } finally {
+        setProcessingState(false);
+      }
+    }
+
+    async function clearStudentLibrary(studentID) {
+      selectedStudentId = studentID;
+      document.getElementById("confirmation-text").textContent =
+        `Are you sure you want to clear Student ID: ${studentID}?`;
+      document.getElementById("confirmation-modal").style.display = "flex";
+    }
+
+    // Event listeners for modals
+    document.getElementById("confirm-edit").addEventListener("click", () => {
+      document.getElementById("edit-confirmation-modal").style.display = "none";
+      enableEdit(selectedStudentId);
+      selectedStudentId = null;
+    });
+
+    document.getElementById("cancel-edit").addEventListener("click", () => {
+      document.getElementById("edit-confirmation-modal").style.display = "none";
+      selectedStudentId = null;
+    });
+
+    document.getElementById("confirm-clearance").addEventListener("click", () => {
+      setProcessingState(true, "Processing library clearance...");
+      
+      const button = document.querySelector(`button[data-id="${selectedStudentId}"]`);
+      document.getElementById("confirmation-modal").style.display = "none";
+
+      if (window.pywebview && window.pywebview.api) {
+        window.pywebview.api.clear_student_library(selectedStudentId)
+          .then(res => {
+            if (res.status === "success") {
+              showMessage(`✅ Library clearance done for ${selectedStudentId}`);
+            } else {
+              showMessage(`${res.message}`, "red");
+            }
+          })
+          .catch(err => {
+            console.error("Clearance error:", err);
+            showMessage(`❌ Error clearing library for ${selectedStudentId}`, "red");
+          })
+          .finally(() => {
+            selectedStudentId = null;
+            setProcessingState(false);
+          });
+      } else {
+        showMessage("❌ Backend API not available.", "red");
+        selectedStudentId = null;
+        setProcessingState(false);
+      }
+    });
+
+    document.getElementById("cancel-clearance").addEventListener("click", () => {
+      document.getElementById("confirmation-modal").style.display = "none";
+      selectedStudentId = null;
+    });
+
+    window.addEventListener("beforeunload", () => {
+      if (studentInterval) clearInterval(studentInterval);
+    });
+
+    setInterval(fetchStudent, 1000);
+  </script>
+</body>
+</html>

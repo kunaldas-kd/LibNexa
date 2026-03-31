@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Issue - Library Management</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #2C3E50;
+      --primary-light: #3498DB;
+      --primary-dark: #1A252F;
+      --accent: #3498DB;
+      --success: #27AE60;
+      --warning: #F39C12;
+      --danger: #E74C3C;
+      --bg-primary: #F8FAFC;
+      --bg-secondary: #FFFFFF;
+      --bg-card: rgba(255, 255, 255, 0.8);
+      --text-primary: #1E293B;
+      --text-secondary: #64748B;
+      --border: rgba(44, 62, 80, 0.1);
+      --shadow: 0 25px 50px -12px rgba(44, 62, 80, 0.15);
+      --glow: 0 0 30px rgba(52, 152, 219, 0.2);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, #E8F4FD 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(52, 152, 219, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(44, 62, 80, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(52, 152, 219, 0.03) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+      background: rgba(255, 255, 255, 0.9);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+    }
+
+    .header-content {
+      max-width: 2200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      position: relative;
+    }
+
+    .back-btn {
+      background: rgba(44, 62, 80, 0.08);
+      border: 1px solid var(--border);
+      color: var(--primary);
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      margin-right: 10px;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+    }
+
+    .header-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .back-btn:hover {
+      background: rgba(44, 62, 80, 0.12);
+      transform: translateX(-2px);
+      box-shadow: var(--glow);
+    }
+
+    .header-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .form-card {
+      width: 100%;
+      max-width: 900px;
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 3rem;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .form-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    }
+
+    .status-message {
+      margin-bottom: 2rem;
+      padding: 1rem;
+      border-radius: 12px;
+      font-weight: 500;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+      min-height: 20px;
+    }
+
+    .status-message.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .status-message.success {
+      background: rgba(39, 174, 96, 0.1);
+      border: 1px solid rgba(39, 174, 96, 0.3);
+      color: #2ECC71;
+    }
+
+    .status-message.error {
+      background: rgba(231, 76, 60, 0.1);
+      border: 1px solid rgba(231, 76, 60, 0.3);
+      color: #E74C3C;
+    }
+
+    .status-message.warning {
+      background: rgba(243, 156, 18, 0.1);
+      border: 1px solid rgba(243, 156, 18, 0.3);
+      color: #F39C12;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--accent);
+      border-radius: 6px;
+      font-size: 12px;
+    }
+
+    .input-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      font-weight: 400;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .input-field::placeholder {
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .input-field:read-only {
+      background: rgba(248, 250, 252, 0.8);
+      cursor: not-allowed;
+      color: var(--text-secondary);
+      border-color: rgba(44, 62, 80, 0.08);
+    }
+
+    .input-field:read-only:focus {
+      transform: none;
+      box-shadow: none;
+      border-color: rgba(44, 62, 80, 0.08);
+    }
+
+    .readonly-indicator {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 6px;
+      height: 6px;
+      background: var(--primary);
+      border-radius: 50%;
+      opacity: 0.4;
+    }
+
+    .submit-button {
+      width: 100%;
+      padding: 1.25rem 2rem;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      border: none;
+      border-radius: 16px;
+      color: #FFFFFF;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .submit-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    .submit-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 40px rgba(44, 62, 80, 0.3);
+      background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent) 100%);
+    }
+
+    .submit-button:hover::before {
+      left: 100%;
+    }
+
+    .submit-button:active {
+      transform: translateY(0);
+    }
+
+    .submit-button:disabled {
+      background: rgba(44, 62, 80, 0.1);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .loader {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(44, 62, 80, 0.3);
+      border-top: 2px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .floating-elements {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .floating-element {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 50%;
+      opacity: 0.1;
+      animation: float 20s infinite linear;
+    }
+
+    .floating-element:nth-child(1) { left: 10%; animation-delay: 0s; }
+    .floating-element:nth-child(2) { left: 20%; animation-delay: 2s; }
+    .floating-element:nth-child(3) { left: 30%; animation-delay: 4s; }
+    .floating-element:nth-child(4) { left: 40%; animation-delay: 6s; }
+    .floating-element:nth-child(5) { left: 50%; animation-delay: 8s; }
+    .floating-element:nth-child(6) { left: 60%; animation-delay: 10s; }
+    .floating-element:nth-child(7) { left: 70%; animation-delay: 12s; }
+    .floating-element:nth-child(8) { left: 80%; animation-delay: 14s; }
+    .floating-element:nth-child(9) { left: 90%; animation-delay: 16s; }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.1;
+      }
+      90% {
+        opacity: 0.1;
+      }
+      100% {
+        transform: translateY(-10vh) scale(1);
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      
+      .form-card {
+        padding: 2rem;
+        margin: 1rem;
+      }
+      
+      .header {
+        padding: 1rem;
+      }
+      
+      .main-content {
+        padding: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .form-card {
+        padding: 1.5rem;
+        border-radius: 16px;
+      }
+      
+      .header-title {
+        font-size: 1.25rem;
+      }
+      
+      .section-title {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="floating-elements">
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+  </div>
+
+  <div class="container">
+    <header class="header">
+      <div class="header-content">
+        <button class="back-btn" onclick="goBack()">←</button>
+        <h1 class="header-title">Issue New Book</h1>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="form-card">
+        <div id="status-msg" class="status-message"></div>
+
+        <div class="form-grid">
+          <div class="form-section">
+            <h2 class="section-title">
+              <span class="section-icon">📚</span>
+              Book Details
+            </h2>
+            
+            <div class="input-group">
+              <input type="text" id="bookid" class="input-field" placeholder="Enter Book ID" />
+            </div>
+            
+            <div class="input-group">
+              <input type="text" id="BookName" class="input-field" placeholder="Auto-Fetched Book Name" readonly />
+              <div class="readonly-indicator"></div>
+            </div>
+            
+            <div class="input-group">
+              <input type="text" id="Author" class="input-field" placeholder="Auto-Fetched Author" readonly />
+              <div class="readonly-indicator"></div>
+            </div>
+            
+            <div class="input-group">
+              <input type="text" id="BookPrice" class="input-field" placeholder="Auto-Fetched Book Price" readonly />
+              <div class="readonly-indicator"></div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h2 class="section-title">
+              <span class="section-icon">🎓</span>
+              Student Details
+            </h2>
+            
+            <div class="input-group">
+              <input type="text" id="studentid" class="input-field" placeholder="Enter Student ID" />
+            </div>
+            
+            <div class="input-group">
+              <input type="text" id="StudentName" class="input-field" placeholder="Auto-Fetched Student Name" readonly />
+              <div class="readonly-indicator"></div>
+            </div>
+            
+            <div class="input-group">
+              <input type="text" id="Department" class="input-field" placeholder="Auto-Fetched Department" readonly />
+              <div class="readonly-indicator"></div>
+            </div>
+            
+            <div class="input-group">
+              <input type="number" id="AdmissionYear" class="input-field" placeholder="Auto-Fetched Admission Year" readonly />
+              <div class="readonly-indicator"></div>
+            </div>
+          </div>
+        </div>
+
+        <button class="submit-button" id="submit-btn" onclick="Issue_Book()">
+          📚 Issue Book
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function showMessage(message, type = "success") {
+      const msgBox = document.getElementById("status-msg");
+      msgBox.textContent = message;
+      msgBox.className = `status-message show ${type}`;
+      
+      setTimeout(() => {
+        msgBox.classList.remove("show");
+      }, 5000);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("submit-btn").disabled = false;
+    });
+
+    async function Issue_Book() {
+      const btn = document.getElementById("submit-btn");
+      const originalHTML = btn.innerHTML;
+
+      const borrowDetails = {
+        bookid: document.getElementById("bookid").value.trim(),
+        studentid: document.getElementById("studentid").value.trim()
+      };
+
+      if (!borrowDetails.bookid || !borrowDetails.studentid) {
+        showMessage("⚠ Please fill out both fields.", "warning");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = `<div class="loader"></div> Issuing Book...`;
+
+      try {
+        const res = await window.pywebview.api.issue_book_to_student(borrowDetails);
+
+        if (res.check_internet === false) {
+          alert("⚠️ No internet connection. Please check your network settings.");
+        } else if (res.Invalid_Student === false) {
+          showMessage(`❌ Invalid Student ID "${borrowDetails.studentid}".`, "error");
+        } else if (res.Invalid_Book === false) {
+          showMessage(`❌ Invalid Book ID "${borrowDetails.bookid}".`, "error");
+        } else if (res.Payment === false) {
+          showMessage(`⚠ Student ID "${borrowDetails.studentid}" is blocked due to unpaid fines.`, "error");
+        } else if (res.Limiting_book === false) {
+          showMessage(`⚠ Borrowing limit reached for Student ID "${borrowDetails.studentid}".`, "error");
+        } else if (res.Stock_book === false) {
+          showMessage(`⚠ Book ID "${borrowDetails.bookid}" is already borrowed or out of stock.`, "error");
+        } else if (res.block === false) {
+          showMessage(`⚠ Student ID "${borrowDetails.studentid}" is blocked.`, "error");
+        } else if (res.done === true) {
+          showMessage(`✅ Success! Book ID "${borrowDetails.bookid}" issued to Student ID "${borrowDetails.studentid}".`, "success");
+          clearFields();
+        } 
+        else if (res.email === false) {
+          showMessage(`⚠️ Email can't be send due to the internet. Check your internet connection!!! `, "error");
+        }
+        else {
+          showMessage("⚠ Unknown error occurred.", "error");
+        }
+      } catch (error) {
+        console.error("API error:", error);
+        showMessage(`❌ Request failed: ${error.message || error}`, "error");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+      }
+    }
+
+    function clearFields() {
+      document.getElementById("bookid").value = "";
+      document.getElementById("studentid").value = "";
+      document.getElementById("StudentName").value = "";
+      document.getElementById("Department").value = "";
+      document.getElementById("AdmissionYear").value = "";
+      document.getElementById("BookName").value = "";
+      document.getElementById("Author").value = "";
+      document.getElementById("BookPrice").value = "";
+    }
+
+    function goBack() {
+      if (window.pywebview?.api?.go_back) {
+        window.pywebview.api.go_back();
+      } else {
+        showMessage("❌ Unable to go back.", "error");
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const studentInput = document.getElementById("studentid");
+      const bookInput = document.getElementById("bookid");
+
+      if (studentInput) {
+        studentInput.addEventListener("input", debounce(fetchStudentDetails, 1000));
+      }
+      if (bookInput) {
+        bookInput.addEventListener("input", debounce(fetchBookDetails, 1000));
+      }
+
+      async function fetchBookDetails() {
+        const bookid = bookInput.value.trim();
+
+        if (!bookid) {
+          clearBookFields();
+          return;
+        }
+
+        try {
+          const response = await window.pywebview.api.get_book_details(bookid);
+          if (response.status === "success") {
+            document.getElementById("BookName").value = response.bookname || "";
+            document.getElementById("Author").value = response.author || "";
+            document.getElementById("BookPrice").value = response.Price || "";
+          } else {
+            clearBookFields();
+            showMessage("❌ No data found for this Book ID.", "error");
+          }
+        } catch (error) {
+          clearBookFields();
+          showMessage("❌ Failed to fetch book details.", "error");
+        }
+      }
+
+      async function fetchStudentDetails() {
+        const studentid = studentInput.value.trim();
+
+        if (!studentid) {
+          clearStudentFields();
+          return;
+        }
+
+        try {
+          const response = await window.pywebview.api.get_student_details(studentid);
+          if (response.status === "success") {
+            document.getElementById("StudentName").value = response.studentname || "";
+            document.getElementById("Department").value = response.Department || "";
+            document.getElementById("AdmissionYear").value = response.admissionyear || "";
+          } else {
+            clearStudentFields();
+            showMessage("❌ No data found for this Student ID.", "error");
+          }
+        } catch (error) {
+          clearStudentFields();
+          showMessage("❌ Failed to fetch student details.", "error");
+        }
+      }
+
+      function clearStudentFields() {
+        document.getElementById("StudentName").value = "";
+        document.getElementById("Department").value = "";
+        document.getElementById("AdmissionYear").value = "";
+      }
+
+      function clearBookFields() {
+        document.getElementById("BookName").value = "";
+        document.getElementById("Author").value = "";
+        document.getElementById("BookPrice").value = "";
+      }
+
+      function debounce(func, delay) {
+        let timeoutId;
+        return function (...args) {
+          clearTimeout(timeoutId);
+          timeoutId = setTimeout(() => func.apply(this, args), delay);
+        };
+      }
+    });
+  </script>
+</body>
+</html>

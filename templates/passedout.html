@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Alumni Directory</title>
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%);
+      color: #2C3E50;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      animation: fadeIn 1.5s ease-in-out;
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      user-select: text;
+    }
+
+    h1 {
+      font-size: 42px;
+      margin-bottom: 30px;
+      text-align: center;
+      color: #2C3E50;
+      text-shadow: 0 2px 8px rgba(44, 62, 80, 0.2);
+      font-weight: 700;
+      letter-spacing: -1px;
+      animation: slideUp 1.2s ease-out;
+      background: linear-gradient(45deg, #2C3E50, #34495e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    #search-container {
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: flex-start;
+      width: 100%;
+      gap: 10px;
+      animation: fadeIn 1.8s ease-in-out;
+    }
+
+    #search-container1 {
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      gap: 10px;
+      animation: fadeIn 2s ease-in-out;
+    }
+
+    #search-input {
+      padding: 12px 16px;
+      font-size: 16px;
+      border-radius: 12px;
+      border: 2px solid rgba(44, 62, 80, 0.2);
+      width: 350px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
+      color: #2C3E50;
+    }
+
+    #search-input:focus {
+      outline: none;
+      border-color: #2C3E50;
+      box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.15), 0 4px 20px rgba(44, 62, 80, 0.2);
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    #search-input::placeholder {
+      color: rgba(44, 62, 80, 0.6);
+    }
+
+    #refresh-button,
+    #download-button {
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    #refresh-button:hover,
+    #download-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(44, 62, 80, 0.4);
+    }
+
+    #refresh-button:active,
+    #download-button:active {
+      transform: translateY(0px);
+    }
+
+    #download-button:disabled {
+      background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      max-height: 70vh;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(44, 62, 80, 0.15);
+      animation: popIn 1s ease-in-out;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(44, 62, 80, 0.1);
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      user-select: text;
+    }
+
+    th, td {
+      border: 1px solid rgba(44, 62, 80, 0.1);
+      padding: 12px 16px;
+      text-align: center;
+      color: #2C3E50;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      user-select: text;
+    }
+
+    th {
+      background: linear-gradient(135deg, #2C3E50, #34495e);
+      color: #FFFFFF;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      font-size: 16px;
+      font-weight: 600;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    tbody tr {
+      transition: all 0.3s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(44, 62, 80, 0.08);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.15);
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(248, 249, 250, 0.7);
+    }
+
+    #loading {
+      font-size: 16px;
+      margin-bottom: 15px;
+      display: block;
+      animation: fadeIn 1s ease-in-out;
+      color: #2C3E50;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 12px 20px;
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(44, 62, 80, 0.1);
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
+    }
+
+    .back-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #2C3E50;
+      border: none;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      animation: slideUp 1s ease-in-out;
+      padding: 10px 12px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
+      border: 1px solid rgba(44, 62, 80, 0.1);
+    }
+
+    .back-btn:hover {
+      transform: scale(1.1) translateY(-2px);
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 6px 20px rgba(44, 62, 80, 0.2);
+      color: #34495e;
+    }
+
+    .status {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 14px;
+      min-height: 20px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(44, 62, 80, 0.1);
+    }
+
+    /* Dropdown styling */
+    #refresh-button, #download-button, #calendar-btn {
+      padding: 12px 14px;
+      font-size: 20px;
+      font-weight: 600;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 110%;
+      right: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      min-width: 250px;
+      border-radius: 12px;
+      box-shadow: 0 15px 35px rgba(44, 62, 80, 0.2);
+      z-index: 10;
+      overflow: hidden;
+      border: 1px solid rgba(44, 62, 80, 0.2);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .dropdown-content button {
+      background: none;
+      color: #2C3E50;
+      padding: 12px 16px;
+      border: none;
+      text-align: left;
+      width: 100%;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .dropdown-content button:hover {
+      background: rgba(44, 62, 80, 0.1);
+      color: #2C3E50;
+      transform: translateX(5px);
+    }
+
+    .dropdown-content.show {
+      display: block;
+    }
+
+    /* Modal styling */
+    .filter-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(50, 80, 44, 0.6);
+      backdrop-filter: blur(8px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .filter-modal > div {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 250, 0.95));
+      backdrop-filter: blur(20px);
+      padding: 30px 40px;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(44, 62, 80, 0.3);
+      min-width: 350px;
+      text-align: center;
+      animation: popIn 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .filter-modal h3 {
+      margin-bottom: 20px;
+      color: #2C3E50;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .filter-modal input {
+      padding: 12px 16px;
+      margin: 15px 0;
+      font-size: 14px;
+      border: 2px solid rgba(44, 62, 80, 0.3);
+      border-radius: 8px;
+      width: 85%;
+      background: rgba(255, 255, 255, 0.9);
+      transition: all 0.3s ease;
+      color: #2C3E50;
+    }
+
+    .filter-modal input:focus {
+      outline: none;
+      border-color: #2C3E50;
+      box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.2);
+    }
+
+    .filter-modal button {
+      padding: 12px 24px;
+      margin: 15px 8px 0 8px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+      min-width: 100px;
+      transition: all 0.3s ease;
+    }
+
+    .filter-modal button:first-of-type {
+      background: linear-gradient(135deg, #098b14, #0bb63f);
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.3);
+    }
+
+    .filter-modal button:first-of-type:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(44, 62, 80, 0.4);
+    }
+
+    .filter-modal button:last-of-type {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+    }
+
+    .filter-modal button:last-of-type:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+    }
+
+    /* Total count display */
+    #total-alumni {
+      width: 100%;
+      text-align: right;
+      margin-top: 15px;
+      font-weight: 600;
+      font-size: 18px;
+      color: #2C3E50;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(44, 62, 80, 0.1);
+      animation: fadeIn 1s ease-in-out;
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <button class="back-btn" onclick="goBack()">←</button>
+  <h1>Alumni Directory</h1>
+  <div id="loading">Loading alumni data...</div>
+  <div id="status-msg" class="status"></div>
+  <div id="search-container">
+    <input type="text" id="search-input" placeholder="Search by any field..." />
+    
+    <div id="search-container1">
+      <button id="refresh-button" onclick="fetchPassedOutStudents()" title="Refresh">🔄️</button>
+      <div class="dropdown">
+        <button id="download-button" title="Download">⬇️</button>
+        <div class="dropdown-content">
+          <button onclick="downloadAll()">Download All</button>
+          <hr>
+          <button onclick="openFilterModal('Department-modal')">By Department</button>
+          <button onclick="openFilterModal('Passedout_Year-modal')">By Passedout Year</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table id="student-table">
+      <thead>
+        <tr>
+          <th>Sl No</th>
+          <th>Student ID</th>
+          <th>Student Name</th>
+          <th>Certificate No</th>
+          <th>Department</th>
+          <th>Student Email</th>
+          <th>Phone Number</th>
+          <th>Passedout Year</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div id="total-alumni">🎓 Total Alumni: 0</div>
+
+  <!-- Department Filter Modal -->
+  <div class="filter-modal" id="Department-modal">
+    <div>
+      <h3>Filter by Department</h3>
+      <input type="text" id="filter-department" placeholder="Enter Department (e.g., CSE)">
+      <div>
+        <button onclick="confirmFilterDownload('Department')">Apply</button>
+        <button onclick="closeFilterModal('Department-modal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Passedout Year Filter Modal -->
+  <div class="filter-modal" id="Passedout_Year-modal">
+    <div>
+      <h3>Filter by Passedout Year</h3>
+      <input type="number" id="filter-year" step="1" placeholder="Enter Year">
+      <div>
+        <button onclick="confirmFilterDownload('Passedout_Year')">Apply</button>
+        <button onclick="closeFilterModal('Passedout_Year-modal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showMessage(message, color = "green") {
+      const msgBox = document.getElementById("status-msg");
+      msgBox.textContent = message;
+      msgBox.style.color = color;
+      setTimeout(() => {
+        msgBox.textContent = "";
+      }, 5000);
+    }
+
+    let allStudentData = [];
+    let firstLoadComplete = false;
+
+    async function fetchPassedOutStudents() {
+      const loadingText = document.getElementById("loading");
+      if (!window.pywebview?.api) return;
+
+      if (!firstLoadComplete) {
+        loadingText.style.display = "block";
+        loadingText.textContent = "Loading alumni data...";
+      }
+
+      try {
+        const studentList = await window.pywebview.api.fetch_passedout_students();
+
+        if (JSON.stringify(studentList) !== JSON.stringify(allStudentData)) {
+          allStudentData = studentList;
+          renderStudentTable(studentList);
+          updateTotalAlumni();
+        }
+
+        if (!firstLoadComplete) {
+          loadingText.style.display = "none";
+          firstLoadComplete = true;
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        loadingText.textContent = "❌ Failed to load data.";
+      }
+    }
+
+    function renderStudentTable(data) {
+      const table = document.getElementById("student-table").querySelector("tbody");
+      table.innerHTML = "";
+
+      data.forEach((entry, index) => {
+        const row = table.insertRow();
+        row.innerHTML = `
+          <td>${entry.Sl_No}</td>
+          <td>${entry.Student_ID}</td>
+          <td>${entry.Student_Name}</td>
+          <td>${entry.Certificate_No}</td>
+          <td>${entry.Department}</td>
+          <td>${entry.Student_Email}</td>
+          <td>${entry.Phone_Number}</td>
+          <td>${entry.Passedout_Year}</td>
+        `;
+      });
+    }
+
+    function updateTotalAlumni() {
+      const count = allStudentData.length;
+      document.getElementById("total-alumni").textContent = `🎓 Total Alumni: ${count}`;
+    }
+
+    document.getElementById("search-input").addEventListener("input", function () {
+      const value = this.value.toLowerCase();
+      const filtered = allStudentData.filter(entry =>
+        Object.values(entry).some(val =>
+          String(val).toLowerCase().includes(value)
+        )
+      );
+      renderStudentTable(filtered);
+    });
+
+    // Dropdown toggle
+    document.getElementById("download-button").addEventListener("click", e => {
+      e.stopPropagation();
+      document.querySelector(".dropdown-content").classList.toggle("show");
+    });
+    window.addEventListener("click", () => {
+      const d = document.querySelector(".dropdown-content");
+      if (d.classList.contains("show")) d.classList.remove("show");
+    });
+
+    // Open modal
+    function openFilterModal(id) {
+      document.getElementById(id).style.display = "flex";
+      if (id === "Passedout_Year-modal") {
+        const yearInput = document.getElementById("filter-year");
+        if (!yearInput.value) yearInput.value = new Date().getFullYear(); // default year
+      }
+    }
+    
+    // Close modal
+    function closeFilterModal(id) {
+      document.getElementById(id).style.display = "none";
+    }
+
+    // Confirm filter and trigger download
+    async function confirmFilterDownload(type) {
+      let val = "";
+      let modalId = "";
+
+      if (type === "Department") {
+        val = document.getElementById("filter-department").value.trim();
+        modalId = "Department-modal";
+        if (!val) {
+          showMessage("⚠️ Please enter a Department name", "orange");
+          return;
+        }
+        await triggerDownload(val, null);
+      } else if (type === "Passedout_Year") {
+        val = document.getElementById("filter-year").value.trim();
+        modalId = "Passedout_Year-modal";
+        if (!val || isNaN(val) || val.length !== 4) {
+          showMessage("⚠️ Please enter a valid 4-digit year", "orange");
+          return;
+        }
+        await triggerDownload(null, val);
+      }
+
+      clearFilters();
+      closeFilterModal(modalId);
+    }
+
+    // Download all (no filters)
+    async function downloadAll() {
+      await triggerDownload();
+    }
+
+    // Call Python backend via pywebview
+    async function triggerDownload(Department = null, Passedout_Year = null) {
+      const btn = document.getElementById("download-button");
+      btn.disabled = true;
+      const original = btn.textContent;
+      btn.textContent = "⌛";
+
+      try {
+        const res = await window.pywebview.api.download(
+          Department,
+          Passedout_Year
+        );
+        if (res) {
+          if (Department || Passedout_Year) {
+            showMessage("✅ Downloaded filtered alumni", "green");
+          } else {
+            showMessage("✅ Downloaded full alumni list", "green");
+          }
+        } else {
+          showMessage("❌ Error downloading", "red");
+        }
+      } catch (e) {
+        console.error(e);
+        alert(`${e}`);
+        showMessage("❌ An error occurred", "red");
+      } finally {
+        btn.textContent = original;
+        btn.disabled = false;
+      }
+    }
+
+    // Clear filter fields
+    function clearFilters() {
+      document.getElementById("filter-department").value = "";
+      document.getElementById("filter-year").value = "";
+    }
+
+    function goBack() {
+      window.pywebview?.api?.go_back();
+    }
+
+    // Initialize
+    setInterval(fetchPassedOutStudents, 1000);
+  </script>
+</body>
+</html>

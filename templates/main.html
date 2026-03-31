@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Streamline library operations with our user-friendly Library Management System." />
+  <meta name="keywords" content="Library Management, Books, Software, Efficient System" />
+  <title>📚 LibNexa</title>
+  <link rel="icon" type="image/png" href="IMG/2.png" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 100vh;
+      color: #1a202c;
+      overflow-x: hidden;
+    }
+
+    :root {
+      --primary-dark: #2c3e50;
+      --primary-green: #00c006;
+      --primary-red: #ef0000;
+      --text-secondary: #4a5568;
+      --bg-white: #fff;
+      --border-radius: 16px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    header {
+      background: linear-gradient(135deg, #2c3e50, #34495e);
+      padding: 1rem;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(10px);
+      animation: slideDown 0.6s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      animation: fadeInLeft 0.8s ease-out 0.2s both;
+    }
+
+    @keyframes fadeInLeft {
+      from {
+        transform: translateX(-30px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .logo-img {
+      background: white;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      object-fit: cover;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      transition: var(--transition);
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    /* @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-8px);
+      }
+      60% {
+        transform: translateY(-4px);
+      }
+    } */
+
+    /* .logo-img:hover {
+      transform: scale(1.1) rotate(5deg);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+    } */
+
+    .brand-text {
+      color: white;
+    }
+
+    .brand-name {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin: 0;
+      background: linear-gradient(45deg, #ffffff, #00c006);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: glow 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+      }
+      to {
+        text-shadow: 0 0 20px rgba(0, 192, 6, 0.8), 0 0 30px rgba(0, 192, 6, 0.6);
+      }
+    }
+
+    .brand-subtitle {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      animation: fadeIn 1s ease-out 0.5s both;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 0.8; }
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 0.75rem;
+      animation: fadeInRight 0.8s ease-out 0.4s both;
+    }
+
+    @keyframes fadeInRight {
+      from {
+        transform: translateX(30px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      border: none;
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-green), #00a005);
+      color: white;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(0, 192, 6, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(0, 192, 6, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(0, 192, 6, 0);
+      }
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--primary-red), #d10000);
+      color: white;
+      animation: pulse-red 2s infinite 1s;
+    }
+
+    @keyframes pulse-red {
+      0% {
+        box-shadow: 0 0 0 0 rgba(239, 0, 0, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(239, 0, 0, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(239, 0, 0, 0);
+      }
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      animation: none;
+    }
+
+    .loading {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    main {
+      margin-top: 100px;
+      padding: 2rem;
+      max-width: 1200px;
+      margin-inline: auto;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 4rem 0;
+      position: relative;
+      animation: fadeInUp 1s ease-out 0.6s both;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        transform: translateY(30px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(0, 192, 6, 0.1) 0%, transparent 70%);
+      animation: float 20s ease-in-out infinite;
+      z-index: -1;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+      33% { transform: translate(-30%, -60%) rotate(120deg); }
+      66% { transform: translate(-70%, -40%) rotate(240deg); }
+    }
+
+    .hero-title {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 800;
+      color: var(--primary-dark);
+      margin-bottom: 1rem;
+      background: linear-gradient(45deg, var(--primary-dark), var(--primary-green));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: titleGlow 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes titleGlow {
+      from {
+        filter: drop-shadow(0 0 5px rgba(44, 62, 80, 0.3));
+      }
+      to {
+        filter: drop-shadow(0 0 15px rgba(0, 192, 6, 0.5));
+      }
+    }
+
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 1.5rem;
+      animation: fadeIn 1.2s ease-out 0.8s both;
+    }
+
+    .hero-credit {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      font-style: italic;
+      opacity: 0.8;
+      animation: fadeIn 1.4s ease-out 1s both;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      border-radius: var(--border-radius);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+      transition: var(--transition);
+      animation: slideInUp 0.8s ease-out both;
+      animation-delay: calc(var(--card-index, 0) * 0.2s);
+    }
+
+    @keyframes slideInUp {
+      from {
+        transform: translateY(50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .card:nth-child(1) { --card-index: 0; }
+    .card:nth-child(2) { --card-index: 1; }
+    .card:nth-child(3) { --card-index: 2; }
+    .card:nth-child(4) { --card-index: 3; }
+
+    .card-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .card-title::before {
+      content: '';
+      width: 6px;
+      height: 24px;
+      background: linear-gradient(135deg, var(--primary-green), var(--primary-dark));
+      border-radius: 3px;
+      animation: expand 0.8s ease-out;
+    }
+
+    @keyframes expand {
+      from {
+        height: 0;
+        opacity: 0;
+      }
+      to {
+        height: 24px;
+        opacity: 1;
+      }
+    }
+
+    .card-content {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      line-height: 1.8;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feature-item {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(5px);
+      border-radius: 12px;
+      padding: 1rem;
+      transition: var(--transition);
+      animation: scaleIn 0.6s ease-out both;
+      animation-delay: calc(var(--item-index, 0) * 0.1s);
+    }
+
+    @keyframes scaleIn {
+      from {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .feature-item:nth-child(1) { --item-index: 0; }
+    .feature-item:nth-child(2) { --item-index: 1; }
+    .feature-item:nth-child(3) { --item-index: 2; }
+    .feature-item:nth-child(4) { --item-index: 3; }
+    .feature-item:nth-child(5) { --item-index: 4; }
+    .feature-item:nth-child(6) { --item-index: 5; }
+
+    .feature-item:hover {
+      transform: translateY(-5px) scale(1.02);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .feature-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      display: inline-block;
+      animation: bounce-icon 2s ease-in-out infinite;
+      animation-delay: calc(var(--item-index, 0) * 0.2s);
+    }
+
+    @keyframes bounce-icon {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-5px);
+      }
+      60% {
+        transform: translateY(-2px);
+      }
+    }
+
+    .feature-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .feature-description {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .contact-info {
+      background: linear-gradient(135deg, var(--primary-dark), #34495e);
+      color: white;
+      border-radius: var(--border-radius);
+      padding: 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .contact-info::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, var(--primary-green), var(--primary-dark), var(--primary-green));
+      border-radius: var(--border-radius);
+      z-index: -1;
+      animation: rotate-border 3s linear infinite;
+    }
+
+    @keyframes rotate-border {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .contact-email {
+      color: var(--primary-green);
+      text-decoration: none;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+
+    .contact-email:hover {
+      color: white;
+      text-shadow: 0 0 10px var(--primary-green);
+    }
+
+    footer {
+      background: var(--primary-dark);
+      color: white;
+      text-align: center;
+      padding: 1.5rem;
+      margin-top: 4rem;
+      animation: fadeIn 1s ease-out 1.5s both;
+    }
+
+    @media (max-width: 768px) {
+      .header-container {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      main {
+        margin-top: 140px;
+        padding: 1rem;
+      }
+
+      .auth-buttons {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .logo-img {
+        animation: bounce 2s ease-in-out infinite;
+      }
+
+      .brand-name {
+        font-size: 1.5rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo-section">
+        <img src="{{logo_path}}" alt="LibNexa logo" class="logo-img" />
+        <div class="brand-text">
+          <h1 class="brand-name">LibNexa</h1>
+          <p class="brand-subtitle">Smart Library Management</p>
+        </div>
+      </div>
+      <div class="auth-buttons">
+        <button id="loginBtn" class="btn btn-primary" onclick="openLogin()">
+          <span class="btn-text">Sign In</span>
+        </button>
+        <button id="registerBtn" class="btn btn-secondary" onclick="openRegister()">
+          <span class="btn-text">Sign Up</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1 class="hero-title">Welcome to LibNexa</h1>
+      <p class="hero-subtitle">
+        A smart, intuitive platform designed to simplify and modernize library management. From tracking books and managing student records to generating clearance certificates, LibNexa brings every essential library task into one streamlined system.
+      </p>
+      <p class="hero-credit">
+        Developed by Kunal Das, Ashim Bakshi, and Arindam Das — final-year students of the Department of Electronics and Telecommunication Engineering (ETCE), Falakata Polytechnic.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2 class="card-title">About LibNexa</h2>
+      <div class="card-content">
+        <p>
+          LibNexa is your all-in-one library management solution designed to simplify and digitize every aspect of library operations. Our mission is to replace outdated manual processes with a smart, efficient system that supports real-time tracking, accurate reporting, and easy access to information.
+        </p>
+        <br />
+        <p>
+          From book issuance and returns to student record management, overdue tracking, payments, and clearance certificates — LibNexa empowers you with everything you need in one seamless platform.
+        </p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card-title">Why Choose LibNexa?</h2>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <div class="feature-icon">🎯</div>
+          <div class="feature-title">All-in-One Platform</div>
+          <div class="feature-description">
+            Manage issuing, returns, student records, payments, and certificates in one system.
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-title">Time-Saving Tools</div>
+          <div class="feature-description">
+            Bulk upload student/book data using Excel templates—ideal for institutions.
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">📊</div>
+          <div class="feature-title">Smart Record Management</div>
+          <div class="feature-description">
+            Track book statuses, renewal history, fines, and transactions with precision.
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🎨</div>
+          <div class="feature-title">Simple & Intuitive UI</div>
+          <div class="feature-description">
+            Clean sidebar layout and button-driven actions for quick navigation.
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🔍</div>
+          <div class="feature-title">Real-Time Search & Exports</div>
+          <div class="feature-description">
+            Locate records instantly and export data for reports or backups.
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🔒</div>
+          <div class="feature-title">Secure & Robust</div>
+          <div class="feature-description">
+            With login/logout, fine tracking, and error handling, your data stays safe.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card-title">Contact Us</h2>
+      <div class="contact-info">
+        <p>We're here to help! Reach out for inquiries, feedback, or support:</p>
+        <p><strong>Email:</strong> <a href="mailto:nestivetech@gmail.com" class="contact-email">nestivetech@gmail.com</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 LibNexa. All Rights Reserved.</p>
+  </footer>
+
+  <script>
+    function setLoading(btnId, isLoading) {
+      const loginBtn = document.getElementById("loginBtn");
+      const registerBtn = document.getElementById("registerBtn");
+      const clickedBtn = document.getElementById(btnId);
+
+      if (!clickedBtn) return;
+
+      if (isLoading) {
+        if (!clickedBtn.dataset.originalText)
+          clickedBtn.dataset.originalText = clickedBtn.innerHTML;
+
+        loginBtn.disabled = true;
+        registerBtn.disabled = true;
+
+        clickedBtn.innerHTML = `<span class="loading"></span> Loading...`;
+      } else {
+        loginBtn.disabled = false;
+        registerBtn.disabled = false;
+
+        loginBtn.innerHTML = loginBtn.dataset.originalText || "Sign In";
+        registerBtn.innerHTML = registerBtn.dataset.originalText || "Sign Up";
+      }
+    }
+
+    async function openLogin() {
+      setLoading("loginBtn", true);
+      try {
+        if (!window.pywebview) throw new Error("PyWebView not available");
+        const response = await window.pywebview.api.open_login();
+        if (response.check_internet === false) {
+          alert("⚠️ No internet connection.");
+        }
+        else {
+                alert("❌ An unexpected error occurred while trying to open Sign In.");
+            }
+      } catch (e) {
+        alert("❌ Unable to open Sign In.");
+        console.error(e);
+      } finally {
+        setLoading("loginBtn", false);
+      }
+    }
+
+    async function openRegister() {
+      setLoading("registerBtn", true);
+      try {
+        if (!window.pywebview) throw new Error("PyWebView not available");
+        const response = await window.pywebview.api.open_register();
+        if (response.check_internet === false) {
+          alert("⚠️ No internet connection.");
+        }
+        else {
+                alert("❌ An unexpected error occurred while trying to open registration.");
+            }
+      } catch (e) {
+        alert("❌ Unable to open registration.");
+        console.error(e);
+      } finally {
+        setLoading("registerBtn", false);
+      }
+    }
+  </script>
+</body>
+</html>
+

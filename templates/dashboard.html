@@ -1,0 +1,1108 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Library Dashboard</title>
+  <style>
+ * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+}
+
+body {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  color: #2c3e50;
+  padding: 0;
+  margin: 0;
+}
+
+.main-content {
+  width: 100%;
+  padding: 30px;
+  max-width: 100vw;
+}
+
+.header {
+  background: linear-gradient(135deg, #2c3e50, #34495e, #4a6741, #5d7a8b, #3c5aa6, #2e4756, #455a64, #2c3e50);
+  background-size: 400% 400%;
+  animation: gradientFlow 8s ease infinite;
+  color: white;
+  padding: 25px;
+  border-radius: 20px;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  box-shadow: 0 10px 30px rgba(44, 62, 80, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: shimmer 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  25% {
+    background-position: 100% 50%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  75% {
+    background-position: 50% 100%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.header img {
+  height: 50px;
+  background-color: white;
+  border-radius: 20%;
+  z-index: 1;
+  position: relative;
+}
+
+.header h1 {
+  font-size: 1.8rem;
+  flex: 1;
+  z-index: 1;
+  position: relative;
+}
+
+.header h2 {
+  font-size: 1.2rem;
+  margin: 0;
+  opacity: 0.9;
+  font-weight: 400;
+  z-index: 1;
+  position: relative;
+}
+
+/* Welcome message styling in header */
+.info-area {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 1));
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 25px;
+  color: #2c3e50;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(44, 62, 80, 0.1);
+  border-left: 4px solid #27ae60;
+}
+
+.info-flex-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.info-text {
+  text-align: center;
+}
+
+.info-text p {
+  font-size: 16px;
+  color: #555;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Notification Bars */
+.notification-container {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+
+.notification-bar {
+  flex: 1;
+  min-width: 300px;
+  padding: 20px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.notification-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.8s;
+}
+
+.notification-bar:hover::before {
+  left: 100%;
+}
+
+.notification-bar:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+}
+
+.overdue-notification {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+  color: white;
+  border-left: 5px solid #e74c3c;
+}
+
+.quick-status-notification {
+  background: linear-gradient(135deg, #4ecdc4, #44a08d);
+  color: white;
+  border-left: 5px solid #16a085;
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1;
+}
+
+.notification-icon {
+  font-size: 2rem;
+  opacity: 0.9;
+}
+
+.notification-text {
+  flex: 1;
+}
+
+.notification-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.notification-message {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+.notification-action {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  color: white;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+.notification-action:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.notification-count {
+  background: rgba(255, 255, 255, 0.9);
+  color: #2c3e50;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-left: 10px;
+}
+
+.search-container {
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 1px solid #2c3e50;
+  background: white;
+  color: #2c3e50;
+  outline: none;
+  text-align: center;
+}
+
+.quick-actions-container {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 1));
+  padding: 30px;
+  border-radius: 20px;
+  color: #2c3e50;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  margin-bottom: 25px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(44, 62, 80, 0.1);
+}
+
+.quick-actions-container h2 {
+  text-align: left;
+  font-size: 32px;
+  margin-bottom: 0;
+  color: #2c3e50;
+  font-weight: 700;
+  background: linear-gradient(135deg, #2c3e50, #34495e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.action-item {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 24px;
+  padding: 25px;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1), 
+              0 1px 8px rgba(0, 0, 0, 0.1),
+              inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.action-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.8s ease;
+}
+
+.action-item::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57);
+  border-radius: 24px 24px 0 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.action-item:hover::before {
+  left: 100%;
+}
+
+.action-item:hover::after {
+  opacity: 1;
+}
+
+.action-item:hover {
+  transform: translateY(-12px) scale(1.03);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15), 
+              0 10px 25px rgba(0, 0, 0, 0.1),
+              inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.action-item p {
+  margin-top: 20px;
+  margin-bottom: 0;
+  line-height: 1.7;
+  font-size: 14px;
+  text-align: justify;
+  color: #4a5568;
+  position: relative;
+  z-index: 1;
+  opacity: 0.9;
+}
+
+.action-item strong {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+.action-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 18px 28px;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3),
+              0 3px 10px rgba(102, 126, 234, 0.2);
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.action-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  transition: left 0.4s ease;
+  z-index: -1;
+}
+
+.action-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  transition: all 0.4s ease;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+.action-btn:hover::before {
+  left: 0;
+}
+
+.action-btn:hover::after {
+  width: 200px;
+  height: 200px;
+}
+
+.action-btn:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4),
+              0 8px 20px rgba(102, 126, 234, 0.3);
+  color: white;
+}
+
+.action-btn:active {
+  transform: translateY(-2px) scale(0.98);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+/* Individual button color themes with better contrast */
+.action-item:nth-child(1) .action-btn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+  color: white;
+}
+
+.action-item:nth-child(1) .action-btn::before {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+.action-item:nth-child(1) .action-btn:hover {
+  box-shadow: 0 15px 40px rgba(255, 107, 107, 0.4);
+}
+
+.action-item:nth-child(2) .action-btn {
+  background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
+  box-shadow: 0 8px 25px rgba(26, 188, 156, 0.3);
+  color: white;
+}
+
+.action-item:nth-child(2) .action-btn::before {
+  background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+}
+
+.action-item:nth-child(2) .action-btn:hover {
+  box-shadow: 0 15px 40px rgba(26, 188, 156, 0.4);
+}
+
+.action-item:nth-child(3) .action-btn {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+  color: white;
+}
+
+.action-item:nth-child(3) .action-btn::before {
+  background: linear-gradient(135deg, #5dade2 0%, #3498db 100%);
+}
+
+.action-item:nth-child(3) .action-btn:hover {
+  box-shadow: 0 15px 40px rgba(52, 152, 219, 0.4);
+}
+
+.action-item:nth-child(4) .action-btn {
+  background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+  box-shadow: 0 8px 25px rgba(155, 89, 182, 0.3);
+  color: white;
+}
+
+.action-item:nth-child(4) .action-btn::before {
+  background: linear-gradient(135deg, #af7ac5 0%, #9b59b6 100%);
+}
+
+.action-item:nth-child(4) .action-btn:hover {
+  box-shadow: 0 15px 40px rgba(155, 89, 182, 0.4);
+}
+
+.action-item:nth-child(5) .action-btn {
+  background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+  box-shadow: 0 8px 25px rgba(243, 156, 18, 0.3);
+  color: white;
+}
+
+.action-item:nth-child(5) .action-btn::before {
+  background: linear-gradient(135deg, #f7dc6f 0%, #f39c12 100%);
+}
+
+.action-item:nth-child(5) .action-btn:hover {
+  box-shadow: 0 15px 40px rgba(243, 156, 18, 0.4);
+}
+
+.action-item:nth-child(6) .action-btn {
+  background: linear-gradient(135deg, #e91e63 0%, #c2185b 100%);
+  box-shadow: 0 8px 25px rgba(233, 30, 99, 0.3);
+  color: white;
+}
+
+.action-item:nth-child(6) .action-btn::before {
+  background: linear-gradient(135deg, #f06292 0%, #e91e63 100%);
+}
+
+.action-item:nth-child(6) .action-btn:hover {
+  box-shadow: 0 15px 40px rgba(233, 30, 99, 0.4);
+}
+
+.action-item:nth-child(7) .action-btn {
+  background: linear-gradient(135deg, #ff5722 0%, #d84315 100%);
+  box-shadow: 0 8px 25px rgba(255, 87, 34, 0.3);
+  color: white;
+}
+
+.action-item:nth-child(7) .action-btn::before {
+  background: linear-gradient(135deg, #ff7043 0%, #ff5722 100%);
+}
+
+.action-item:nth-child(7) .action-btn:hover {
+  box-shadow: 0 15px 40px rgba(255, 87, 34, 0.4);
+}
+
+.action-item:nth-child(8) .action-btn {
+  background: linear-gradient(135deg, #607d8b 0%, #455a64 100%);
+  box-shadow: 0 8px 25px rgba(96, 125, 139, 0.3);
+  color: white;
+}
+
+.action-item:nth-child(8) .action-btn::before {
+  background: linear-gradient(135deg, #78909c 0%, #607d8b 100%);
+}
+
+.action-item:nth-child(8) .action-btn:hover {
+  box-shadow: 0 15px 40px rgba(96, 125, 139, 0.4);
+}
+
+.action-item:nth-child(9) .action-btn {
+  background: linear-gradient(135deg, #795548 0%, #5d4037 100%);
+  box-shadow: 0 8px 25px rgba(121, 85, 72, 0.3);
+  color: white;
+}
+
+.action-item:nth-child(9) .action-btn::before {
+  background: linear-gradient(135deg, #8d6e63 0%, #795548 100%);
+}
+
+.action-item:nth-child(9) .action-btn:hover {
+  box-shadow: 0 15px 40px rgba(121, 85, 72, 0.4);
+}
+
+.action-item:nth-child(10) .action-btn {
+  background: linear-gradient(135deg, #009688 0%, #00695c 100%);
+  box-shadow: 0 8px 25px rgba(0, 150, 136, 0.3);
+  color: white;
+}
+
+.action-item:nth-child(10) .action-btn::before {
+  background: linear-gradient(135deg, #26a69a 0%, #009688 100%);
+}
+
+.action-item:nth-child(10) .action-btn:hover {
+  box-shadow: 0 15px 40px rgba(0, 150, 136, 0.4);
+}
+
+.action-item:nth-child(11) .action-btn {
+  background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+  box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+  color: white;
+}
+
+.action-item:nth-child(11) .action-btn::before {
+  background: linear-gradient(135deg, #66bb6a 0%, #4caf50 100%);
+}
+
+.action-item:nth-child(11) .action-btn:hover {
+  box-shadow: 0 15px 40px rgba(76, 175, 80, 0.4);
+}
+
+/* Enhanced animations */
+@keyframes buttonPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+@keyframes cardFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+.action-item {
+  animation: cardFloat 6s ease-in-out infinite;
+}
+
+.action-item:nth-child(even) {
+  animation-delay: -3s;
+}
+
+.action-btn:focus {
+  outline: none;
+  animation: buttonPulse 1s ease-in-out 3;
+}
+
+#overdue-board {
+  width: 100%;
+  background: linear-gradient(135deg, rgba(255, 244, 244, 0.95), rgba(255, 244, 244, 1));
+  padding: 0;
+  margin-bottom: 20px;
+  border-left: 4px solid #e74c3c;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  flex-shrink: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  position: relative;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(231, 76, 60, 0.2);
+}
+
+/* Quick Stats Container */
+.quick-stats-container {
+  background: linear-gradient(135deg, rgba(240, 248, 255, 0.95), rgba(240, 248, 255, 1));
+  padding: 0;
+  border-left: 4px solid #3498db;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(52, 152, 219, 0.2);
+  margin-bottom: 20px;
+}
+
+.quick-stats-container h2 {
+  position: sticky;
+  top: 0;
+  background-color: #f0f8ff;
+  padding: 8px 15px;
+  color: #2980b9;
+  font-size: 18px;
+  text-align: left;
+  margin: 0;
+  z-index: 10;
+  border-bottom: 1px solid #e0e0e0;
+  border-radius: 16px 16px 0 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  padding: 15px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 12px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(52, 152, 219, 0.1);
+}
+
+.stat-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.stat-icon {
+  font-size: 1.5rem;
+  opacity: 0.8;
+}
+
+.stat-info {
+  flex: 1;
+}
+
+.stat-number {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #2c3e50;
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #7f8c8d;
+  font-weight: 500;
+}
+
+#overdue-board::-webkit-scrollbar {
+  display: none;
+}
+
+#overdue-board h2 {
+  position: sticky;
+  top: 0;
+  background-color: #fff4f4;
+  padding: 8px 15px;
+  color: #c0392b;
+  font-size: 18px;
+  text-align: left;
+  margin: 0;
+  z-index: 10;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+#overdue-list {
+  list-style: none;
+  padding: 8px 15px;
+  margin: 0;
+}
+
+#overdue-list li {
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  text-align: justify;
+  position: relative;
+  color: #2c3e50;
+}
+
+/* Animation for notification updates */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.notification-pulse {
+  animation: pulse 2s infinite;
+}
+
+/* Tablet and Mobile responsive */
+@media (max-width: 992px) {
+  .main-content {
+    padding: 15px;
+  }
+  .search-input {
+    width: 90%;
+  }
+  .header {
+    flex-direction: column;
+    text-align: center;
+  }
+  .header img {
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-size: 1.5rem;
+    flex: none;
+  }
+  .notification-container {
+    flex-direction: column;
+  }
+  .notification-bar {
+    min-width: auto;
+  }
+  .actions-grid {
+    grid-template-columns: 1fr;
+  }
+  .action-btn {
+    font-size: 14px;
+    padding: 10px;
+  }
+  /* Stack layout on tablets */
+  .main-content > div:nth-child(4) {
+    flex-direction: column !important;
+  }
+  .main-content > div:nth-child(4) > div:last-child {
+    width: 100% !important;
+    flex-direction: row !important;
+    gap: 15px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .info-flex-container {
+    flex-direction: column;
+  }
+  .quick-actions-container h2 {
+    font-size: 24px;
+    text-align: center;
+  }
+  .quick-actions-container > div:first-child {
+    flex-direction: column;
+    align-items: center !important;
+  }
+  .notification-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+  .notification-icon {
+    font-size: 1.5rem;
+  }
+  /* Mobile layout adjustments */
+  .main-content > div:nth-child(4) {
+    flex-direction: column !important;
+  }
+  .main-content > div:nth-child(4) > div:last-child {
+    width: 100% !important;
+    flex-direction: column !important;
+  }
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Hidden state for notifications */
+.notification-hidden {
+  display: none;
+}
+
+  </style>
+</head>
+<body>
+  <div class="main-content">
+    <div class="header">
+      <img src="{{logo_path}}" alt="Logo" />
+      <h1>LibNexa</h1>
+      <h2>📖 Welcome!</h2>
+      <div class="institute" id="institute"></div>
+    </div>
+
+    <!-- Welcome message section -->
+    <div class="info-area">
+      <div class="info-flex-container">
+        <div class="info-text">
+          <p>
+            Welcome to your comprehensive library management solution. Use the Quick Actions below to navigate to different sections of the system. Each module is designed to streamline library operations and maintain accurate records of all transactions and inventory.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 30px; align-items: flex-start;">
+      <!-- Quick Actions Container -->
+      <div class="quick-actions-container" style="flex: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; flex-wrap: wrap; gap: 20px;">
+          <h2 style="margin: 0;">⚡ Quick Actions</h2>
+        </div>
+        <div class="actions-grid">
+        
+        <div class="action-item">
+          <button class="action-btn" onclick="viewBorrowRegister()">📘 Student Library Transactions</button>
+          <p>Issue, return, and renew books for students with complete transaction tracking.</p>
+        </div>
+        
+        <div class="action-item">
+          <button class="action-btn" onclick="teacherregister()">📗 Teacher Library Transactions</button>
+          <p>Manage book lending operations specifically for teachers and faculty members.</p>
+        </div>
+        
+        <div class="action-item">
+          <button class="action-btn" onclick="viewStudentDatabase()">👨‍🎓 Student Management</button>
+          <p>Register, search, and manage student records with bulk import capabilities.</p>
+        </div>
+        
+        <div class="action-item">
+          <button class="action-btn" onclick="viewBookStock()">📦 Inventory Management</button>
+          <p>Track book quantities, add new stock, Assign unique Book IDs and generate inventory reports.</p>
+        </div>
+        
+        <div class="action-item">
+          <button class="action-btn" onclick="viewBookDatabase()">📖 Book Catalog</button>
+          <p>The complete book catalog.</p>
+        </div>
+        
+        <div class="action-item">
+          <button class="action-btn" onclick="viewteacherDatabase()">👨‍🏫 Teacher Management</button>
+          <p>Register and organize teacher records within the system database.</p>
+        </div>
+        
+        <div class="action-item">
+          <button class="action-btn" onclick="view_passedoutstudents()">🎓 Alumni Directory</button>
+          <p>Maintain records of graduated students with certificates and contact details.</p>
+        </div>
+        
+        <div class="action-item">
+          <button class="action-btn" onclick="cashbook()">📒 Financial Ledger</button>
+          <p>Track all financial transactions including credits, debits, and payment records.</p>
+        </div>
+        
+        <div class="action-item">
+          <button class="action-btn" onclick="BOOKRECOVERY()">📚 Recover from Student</button>
+          <p>Record compensation for lost or damaged books before student clearance.</p>
+        </div>
+        
+        <div class="action-item">
+          <button class="action-btn" onclick="assignMissingBook()">📓 Assign Missing Book</button>
+          <p>Track lost or damaged books and manage replacement procedures.</p>
+        </div>
+        
+        <div class="action-item">
+          <button class="action-btn" onclick="setting()">⚙️ Settings</button>
+          <p>Configure system preferences and customize application behavior.</p>
+        </div>
+        
+      </div>
+    </div>
+
+    <!-- Right Side Containers -->
+    <div style="display: flex; flex-direction: column; gap: 20px; width: 350px; flex-shrink: 0;">
+      <!-- Overdue Book Reminders Container -->
+      <div id="overdue-board">
+        <h2>📌 Overdue Book Reminders</h2>
+        <ul id="overdue-list">
+          <li>✅ No overdue books.</li>
+        </ul>
+      </div>
+
+      <!-- Quick Stats Container -->
+      <div class="quick-stats-container">
+        <h2>📊 Quick Statistics</h2>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-icon">📚</div>
+            <div class="stat-info">
+              <div class="stat-number" id="total-books">0</div>
+              <div class="stat-label">Total Books</div>
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon">👨‍🎓</div>
+            <div class="stat-info">
+              <div class="stat-number" id="total-students">0</div>
+              <div class="stat-label">Total Students</div>
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon">👨‍🏫</div>
+            <div class="stat-info">
+              <div class="stat-number" id="total-teachers">0</div>
+              <div class="stat-label">Total Teachers</div>
+            </div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-icon">📖</div>
+            <div class="stat-info">
+              <div class="stat-number" id="books-issued">0</div>
+              <div class="stat-label">Books Issued</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Flag to ensure no duplicate or redundant API calls
+  let isLoadingData = false;
+
+  async function teacherregister() {
+    await window.pywebview.api.teacher_register();
+  }
+
+  async function viewteacherDatabase() {
+    await window.pywebview.api.open_teacher_list();
+  }
+
+  async function viewStudentDatabase() {
+    await window.pywebview.api.student_view();
+  }
+
+  async function viewBookDatabase() {
+    await window.pywebview.api.book_view();
+  }
+
+  async function viewBookStock() {
+    await window.pywebview.api.book_stock_view();
+  }
+
+  async function viewBorrowRegister() {
+    await window.pywebview.api.borrow_register_view();
+  }
+
+  async function view_passedoutstudents() {
+    await window.pywebview.api.passedout_students_view();
+  }
+
+  async function assignMissingBook() {
+    await window.pywebview.api.MissingBook();
+  }
+
+  async function cashbook() {
+    await window.pywebview.api.cash_book();
+  }
+
+  async function BOOKRECOVERY() {
+    await window.pywebview.api.BOOKRECOVERY();
+  }
+
+  async function setting() {
+    await window.pywebview.api.settings();
+  }
+
+  async function toggleSidebar() {
+    const hamburger = document.querySelector('.hamburger');
+    const sidebar = document.querySelector('.sidebar');
+    const body = document.querySelector('body');
+    hamburger.classList.toggle('active');
+    sidebar.classList.toggle('active');
+    body.classList.toggle('sidebar-open');
+  }
+
+  async function loadOverdueBoard() {
+    const list = document.getElementById("overdue-list");
+    try {
+      const overdueData = await window.pywebview.api.reminderboard();
+      console.log("Overdue Data:", overdueData);  // for debugging
+      list.innerHTML = "";
+
+      if (!overdueData.length) {
+        list.innerHTML = "<li style='color: green;'>✅ No overdue books.</li>";
+        return;
+      }
+
+      overdueData.forEach(entry => {
+        const li = document.createElement("li");
+        li.innerHTML = `📍 Student assigned to ID <strong>${entry.Student_ID} (${entry.Student_Name})</strong> has not submitted the book "<strong>${entry.Book_Name}</strong>" (Due on <strong>${entry.Due_Date}</strong>).`;
+        list.appendChild(li);
+      });
+    } catch (err) {
+      console.error("Error fetching overdue reminders:", err);
+      list.innerHTML = "<li>⚠️ Unable to load reminders.</li>";
+    }
+  }
+
+  // Batch update functions
+  async function updateStats() {
+    if (isLoadingData) return;  // Prevent redundant calls while data is loading
+    isLoadingData = true;
+
+    try {
+      // Fetch all stats in one go
+      const [
+        totalQty,
+        countStudents,
+        countTeachers,
+        statsIssued,
+        instituteName
+      ] = await Promise.all([
+        window.pywebview.api.total_books(),
+        window.pywebview.api.total_student(),
+        window.pywebview.api.total_teacher(),
+        window.pywebview.api.total_issued(),
+        window.pywebview.api.institutename()
+      ]);
+
+      // Update the UI with fetched data
+      document.getElementById("total-books").textContent = totalQty.total || "...";
+      document.getElementById("total-students").textContent = countStudents.total || "...";
+      document.getElementById("total-teachers").textContent = countTeachers.total || "...";
+      document.getElementById("books-issued").textContent = statsIssued.total || "...";
+      document.getElementById("institute").textContent = instituteName || "Loading...";
+
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      // Fallback in case of errors
+      document.getElementById("total-books").textContent = "...";
+      document.getElementById("total-students").textContent = "...";
+      document.getElementById("total-teachers").textContent = "...";
+      document.getElementById("books-issued").textContent = "...";
+      document.getElementById("institute").textContent = "Loading...";
+    } finally {
+      isLoadingData = false;
+    }
+  }
+
+  // Initialize data on page load (single call for stats)
+  document.addEventListener('DOMContentLoaded', function() {
+    updateStats();  // Fetch stats once when the page loads
+    setInterval(updateStats, 3000);  // Re-fetch stats periodically
+    loadOverdueBoard();  // Load overdue board once
+    setInterval(loadOverdueBoard, 10000);  // Update overdue board every minute
+  });
+</script>
+
+</body>
+</html>
+
+

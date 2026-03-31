@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Library Borrow Register</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200px 0; }
+      100% { background-position: calc(200px + 100%) 0; }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary-color: #2c3e50;
+      --primary-light: #34495e;
+      --primary-dark: #1a252f;
+      --accent-color: #3498db;
+      --accent-hover: #2980b9;
+      --success-color: #27ae60;
+      --success-hover: #229954;
+      --warning-color: #f39c12;
+      --warning-hover: #e67e22;
+      --danger-color: #e74c3c;
+      --danger-hover: #c0392b;
+      --info-color: #17a2b8;
+      --background-gradient: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%);
+      --glass-bg: rgba(255, 255, 255, 0.9);
+      --glass-border: rgba(44, 62, 80, 0.15);
+      --shadow-light: 0 4px 15px rgba(44, 62, 80, 0.08);
+      --shadow-medium: 0 8px 25px rgba(44, 62, 80, 0.15);
+      --shadow-heavy: 0 20px 40px rgba(44, 62, 80, 0.2);
+      --text-primary: #2c3e50;
+      --text-secondary: #6c757d;
+      --text-muted: #8e9ba8;
+      --neutral-color: #6c757d;
+      --neutral-hover: #5a6268;
+    }
+
+    body {
+      background: var(--background-gradient);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      animation: fadeIn 1.5s ease-in-out;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+    }
+
+    h1 {
+      font-size: clamp(28px, 5vw, 42px);
+      margin-bottom: 30px;
+      text-align: center;
+      color: var(--primary-color);
+      font-weight: 700;
+      letter-spacing: -1px;
+      animation: slideUp 1.2s ease-out;
+      position: relative;
+    }
+
+    h1::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+      border-radius: 2px;
+      animation: fadeIn 2s ease-in-out;
+    }
+
+    .controls-wrapper {
+      width: 100%;
+      max-width: 2200px;
+      margin-bottom: 20px;
+    }
+
+    .controls-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .search-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .action-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #search-input {
+      padding: 12px 16px;
+      font-size: 16px;
+      border-radius: 12px;
+      border: 2px solid var(--glass-border);
+      flex: 1;
+      max-width: 400px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-light);
+      color: var(--text-primary);
+    }
+
+    #search-input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15), var(--shadow-medium);
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    #search-input::placeholder {
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .btn {
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-light);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+      min-width: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg,  #27ae5f,
+     #229954);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #27ae5f,
+     #229954);
+    }
+
+    /* .btn-success {
+      background: linear-gradient(135deg, var(--success-color), var(--success-hover));
+    }
+
+    .btn-warning {
+      background: linear-gradient(135deg, var(--warning-color), var(--warning-hover));
+    }
+
+    .btn-info {
+      background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, var(--danger-color), var(--danger-hover));
+    } */
+
+    .btn-payment {
+      background: linear-gradient(135deg, var(--info-color), #138496);
+    }
+
+    .btn:disabled {
+      background: linear-gradient(135deg, #95a5a6, #7f8c8d) !important;
+      cursor: not-allowed;
+      opacity: 0.7;
+      transform: none !important;
+    }
+
+    .btn-icon {
+      font-size: 18px;
+      padding: 12px;
+      min-width: 44px;
+    }
+
+    .btn-small {
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      min-width: auto;
+    }
+
+    /* Action button styles for table rows - Made neutral/colorless */
+    .renewbtn, .submitbtn, .paymentbtn {
+   
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--glass-bg);
+      border: 2px solid var(--glass-border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      margin: 2px;
+      min-width: 60px;
+      position: relative;
+      overflow: hidden;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+    }
+
+    .submitbtn{background-color: var(--success-color);}
+    .renewbtn{background-color: var(--warning-color);}  
+    .paymentbtn{background-color: var(--accent-color);}
+    .renewbtn:hover, .submitbtn:hover, .paymentbtn:hover {
+      /* background: rgb(3, 182, 3); */
+      
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(44, 62, 80, 0.2);
+      border-color: var(--neutral-color);
+      color: white;
+    }
+
+    .renewbtn:active, .submitbtn:active, .paymentbtn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .renewbtn:disabled, .submitbtn:disabled, .paymentbtn:disabled {
+      background: rgba(149, 165, 166, 0.3);
+      border-color: rgba(149, 165, 166, 0.5);
+      color: rgba(127, 140, 141, 0.7);
+      cursor: not-allowed;
+      opacity: 0.7;
+      transform: none;
+    }
+
+    .renewbtn:disabled:hover, .submitbtn:disabled:hover, .paymentbtn:disabled:hover {
+      transform: none;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      background: rgba(149, 165, 166, 0.3);
+      border-color: rgba(149, 165, 166, 0.5);
+      color: rgba(127, 140, 141, 0.7);
+    }
+
+    #loading {
+      font-size: 16px;
+      margin-bottom: 15px;
+      display: none;
+      animation: fadeIn 1s ease-in-out;
+      color: var(--text-primary);
+      background: var(--glass-bg);
+      padding: 16px 24px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-light);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loader {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 3px solid rgba(52, 152, 219, 0.3);
+      border-top: 3px solid var(--accent-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 8px;
+    }
+
+    .back-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: var(--glass-bg);
+      color: var(--primary-color);
+      border: none;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      animation: slideUp 1s ease-in-out;
+      padding: 12px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-light);
+      border: 1px solid var(--glass-border);
+      z-index: 100;
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .back-btn:hover {
+      transform: scale(1.1) translateY(-2px);
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: var(--shadow-medium);
+      color: var(--accent-color);
+    }
+
+    .table-container {
+      width: 100%;
+      max-width: 2200px;
+      overflow-x: auto;
+      max-height: 55vh;
+      border-radius: 16px;
+      box-shadow: var(--shadow-heavy);
+      animation: popIn 1s ease-in-out;
+      background: var(--glass-bg);
+      backdrop-filter: blur(15px);
+      border: 1px solid var(--glass-border);
+      position: relative;
+    }
+
+    .table-container::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    .table-container::-webkit-scrollbar-track {
+      background: rgba(44, 62, 80, 0.1);
+      border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+      border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 1400px;
+      user-select: text;
+    }
+
+    th, td {
+      border: 1px solid var(--glass-border);
+      padding: 12px 8px;
+      text-align: center;
+      color: var(--text-primary);
+      font-size: 12px;
+      transition: all 0.3s ease;
+    }
+
+    th {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+      color: #FFFFFF;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      font-size: 13px;
+      font-weight: 600;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    tbody tr {
+      transition: all 0.3s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(52, 152, 219, 0.08);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(44, 62, 80, 0.1);
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(248, 249, 250, 0.3);
+    }
+
+    tbody tr:nth-child(even):hover {
+      background: rgba(52, 152, 219, 0.12);
+    }
+
+    .status-icon {
+      font-size: 16px;
+      display: inline-block;
+    }
+
+    .status-success {
+      color: var(--success-color);
+      animation: pulse 2s infinite;
+    }
+
+    .payment-status {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .payment-nothing {
+      background: rgba(108, 117, 125, 0.1);
+      color: var(--text-muted);
+    }
+
+    .payment-due {
+      background: rgba(231, 76, 60, 0.1);
+      color: var(--danger-color);
+    }
+
+    .payment-paid {
+      background: rgba(39, 174, 96, 0.1);
+      color: var(--success-color);
+    }
+
+    .summary-section {
+      width: 100%;
+      max-width: 1400px;
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      animation: fadeIn 1.5s ease-in-out;
+    }
+
+    .summary-card {
+      background: var(--glass-bg);
+      padding: 2px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-light);
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .summary-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
+    }
+
+    .summary-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    }
+
+    .summary-label {
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-weight: 500;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .summary-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+
+    .status {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 14px;
+      min-height: 20px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(44, 62, 80, 0.1);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Modal Styles */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(44, 62, 80, 0.8);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 250, 0.95));
+      backdrop-filter: blur(20px);
+      padding: 30px 40px;
+      border-radius: 16px;
+      text-align: center;
+      animation: popIn 0.3s ease;
+      box-shadow: var(--shadow-heavy);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      min-width: 350px;
+      max-width: 500px;
+      position: relative;
+    }
+
+    .modal-title {
+      font-size: 22px;
+      margin-bottom: 20px;
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+
+    .modal-text {
+      font-size: 16px;
+      margin-bottom: 25px;
+      color: var(--primary-color);
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--primary-color);
+      font-size: 14px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 2px solid var(--glass-border);
+      background: rgba(255, 255, 255, 0.9);
+      transition: all 0.3s ease;
+      color: var(--primary-color);
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+    }
+    .btn-primary1{background-color: #45e414;}
+    .btn-danger{background-color: rgb(223, 17, 17);}
+    .btn-warning{background-color: rgb(64, 131, 255);}
+    .btn-success{background-color: #45e414;}
+
+
+
+
+    /* Dropdown Styles */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      top: 110%;
+      right: 0;
+      background: var(--glass-bg);
+      backdrop-filter: blur(15px);
+      min-width: 200px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-medium);
+      z-index: 100;
+      overflow: hidden;
+      border: 1px solid var(--glass-border);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .dropdown-content.show {
+      display: block;
+    }
+
+    .dropdown-item {
+      background: none;
+      color: var(--primary-color);
+      padding: 12px 16px;
+      border: none;
+      text-align: left;
+      width: 100%;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .dropdown-item:hover {
+      background: linear-gradient(135deg, rgba(44, 62, 80, 0.1), rgba(52, 152, 219, 0.1));
+      color: var(--accent-color);
+      transform: translateX(5px);
+    }
+
+    /* Loading States */
+    .btn-loading {
+      position: relative;
+      color: transparent !important;
+    }
+
+    .btn-loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top: 2px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    /* Currency formatting */
+    .currency {
+      font-weight: 600;
+      color: var(--success-color);
+    }
+
+    .currency.negative {
+      color: var(--danger-color);
+    }
+
+    /* Department badge */
+    .dept-badge {
+      background: rgba(52, 152, 219, 0.1);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--primary-color);
+      border: 1px solid rgba(52, 152, 219, 0.2);
+    }
+
+    /* Book ID and Student ID styling */
+    .id-field {
+      font-weight: 600;
+      color: var(--primary-color);
+      font-family: 'Monaco', 'Consolas', monospace;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .controls-top {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .search-group {
+        min-width: unset;
+        width: 100%;
+      }
+
+      .action-group {
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .summary-section {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      }
+
+      .modal-content {
+        margin: 20px;
+        min-width: unset;
+        max-width: calc(100vw - 40px);
+      }
+
+      th, td {
+        padding: 6px 4px;
+        font-size: 11px;
+      }
+
+      .back-btn {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+      }
+
+      table {
+        min-width: 1200px;
+      }
+
+      .renewbtn, .submitbtn, .paymentbtn {
+        padding: 4px 8px;
+        font-size: 11px;
+        min-width: 50px;
+      }
+    }
+
+    /* Enhanced animations for better UX */
+    .fade-in-up {
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .table-row-enter {
+      animation: tableRowEnter 0.4s ease-out;
+    }
+
+    @keyframes tableRowEnter {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <button class="back-btn" onclick="goBack()" title="Go Back">←</button>
+  
+  <h1>Library Borrowing Records</h1>
+  
+  <div id="loading">
+    <span class="loader"></span>
+    <span>Loading borrow data...</span>
+  </div>
+
+  <div id="status-msg" class="status"></div>
+
+  <div class="controls-wrapper">
+    <div class="controls-top">
+      <div class="search-group">
+        <input type="text" id="search-input" placeholder="🔍 Search by any field..." />
+        <button class="btn btn-icon" onclick="openDateModal1()" title="Filter by Date Range">
+          📅
+        </button>
+        <button class="btn btn-icon" onclick="fetchBorrowRegister()" title="Refresh Data">
+          🔄
+        </button>
+        <div class="dropdown">
+          <button class="btn btn-info btn-icon" id="download-button" title="Download Options">
+            ⬇️
+          </button>
+          <div class="dropdown-content">
+            <button class="dropdown-item" onclick="downloadAll()">📊 Download All Records</button>
+            <button class="dropdown-item" onclick="openDateModal()">📅 Download by Date Range</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="action-group">
+        <button class="btn btn-primary" onclick="bookIssue()">
+          📖 Issue New Book
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table id="borrow-table">
+      <thead>
+        <tr>
+          <th>Sl No</th>
+          <th>Book ID</th>
+          <th>Student ID</th>
+          <th>Student Name</th>
+          <th>Department</th>
+          <th>Book Name</th>
+          <th>Author</th>
+          <th>Published Year</th>
+          <th>Edition</th>
+          <th>Book Price</th>
+          <th>Issue Date</th>
+          <th>Return Date</th>
+          <th>Fine Amount</th>
+          <th>Borrowed</th>
+          <th>Submitted</th>
+          <th>Renewed</th>
+          <th>Payment Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Rows will be injected here -->
+      </tbody>
+    </table>
+  </div>
+
+  <div class="summary-section">
+    <div class="summary-card">
+      <div class="summary-label">Total Records</div>
+      <div class="summary-value" id="total-books">0</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Currently Issued</div>
+      <div class="summary-value" id="Issued">0</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Submitted</div>
+      <div class="summary-value" id="Submitted">0</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label">Renewed</div>
+      <div class="summary-value" id="Renewed">0</div>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmation-modal" class="modal">
+    <div class="modal-content">
+      <h3 class="modal-title">Confirm Action</h3>
+      <p id="confirmation-text" class="modal-text">Are you sure?</p>
+      <div class="modal-buttons">
+        <button id="confirm-btn" class="btn btn-success">✓ Confirm</button>
+        <button id="cancel-btn" class="btn btn-danger">✗ Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Date Range Download Modal -->
+  <div id="date-modal" class="modal">
+    <div class="modal-content">
+      <h3 class="modal-title">Download by Date Range</h3>
+      <div class="form-group">
+        <label class="form-label">From Date:</label>
+        <input type="date" id="start-date" class="form-input">
+      </div>
+      <div class="form-group">
+        <label class="form-label">To Date:</label>
+        <input type="date" id="end-date" class="form-input">
+      </div>
+      <div class="modal-buttons">
+        <button onclick="confirmDateDownload()" class="btn btn-primary">📥 Download</button>
+        <button onclick="closeDateModal()" class="btn btn-danger">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Date Range Filter Modal -->
+  <div id="date-modal1" class="modal">
+    <div class="modal-content">
+      <h3 class="modal-title">Filter by Date Range</h3>
+      <div class="form-group">
+        <label class="form-label">From Date:</label>
+        <input type="date" id="start-date1" class="form-input">
+      </div>
+      <div class="form-group">
+        <label class="form-label">To Date:</label>
+        <input type="date" id="end-date1" class="form-input">
+      </div>
+      <div class="modal-buttons">
+        <button onclick="applyDateFilter()" class="btn btn-primary">🔍 Apply Filter</button>
+        <button onclick="resetDateFilter()" class="btn btn-warning">🔄 Reset</button>
+        <button onclick="closeDateModal1()" class="btn btn-danger">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+
+<script>
+    let allBorrowData = [];
+    let firstLoadComplete = false;
+    let borrowInterval;
+    let pendingAction = null;
+
+    function showMessage(message, color = "green") {
+      const msgBox = document.getElementById("status-msg");
+      msgBox.textContent = message;
+      msgBox.style.color = color;
+      setTimeout(() => msgBox.textContent = "", 5000);
+    }
+
+    async function fetchBorrowRegister() {
+      const loadingText = document.getElementById("loading");
+      if (!window.pywebview?.api) return;
+
+      if (!firstLoadComplete) loadingText.style.display = "block";
+
+      try {
+        const borrowList = await window.pywebview.api.fetchborrowregister();
+        await fetchSummary();
+        if (JSON.stringify(borrowList) !== JSON.stringify(allBorrowData)) {
+          allBorrowData = borrowList;
+          renderBorrowTable(borrowList);
+        }
+        if (!firstLoadComplete) {
+          loadingText.style.display = "none";
+          firstLoadComplete = true;
+          borrowInterval = setInterval(fetchBorrowRegister, 10000);
+        }
+      } catch (e) {
+        console.error(e);
+        showMessage("❌ Failed to load data.", "red");
+      }
+    }
+
+    function renderBorrowTable(data) {
+      const table = document.querySelector("#borrow-table tbody");
+      table.innerHTML = "";
+      data.forEach(entry => {
+        const row = table.insertRow();
+        row.innerHTML = `
+          <td>${entry.Sl_No}</td>
+          <td>${entry.Book_ID}</td>
+          <td>${entry.Student_ID}</td>
+          <td>${entry.Student_Name}</td>
+          <td>${entry.Department}</td>
+          <td>${entry.Book_Name}</td>
+          <td>${entry.Author}</td>
+          <td>${entry.Published_Year}</td>
+          <td>${entry.Edition}</td>
+          <td>${entry.Book_Price}</td>
+          <td>${entry.Borrow_Date}</td>
+          <td>${entry.Return_Date}</td>
+          <td>₹ ${entry.Payable_Amount}</td>
+          <td>${entry.Borrow ? "✅" : ""}</td>
+          <td>${entry.Submit ? "✅" : ""}</td>
+          <td>${entry.Renew ? "✅" : ""}</td>
+          <td>${
+            entry.Payment_Status === "NOTHING TO PAY" ? "🚫" :
+            entry.Payment_Status === "NOT PAID" ? "Due" :
+            entry.Payment_Status === "PAID" ? "Paid" :
+            entry.Payment_Status
+          }</td>
+          <td>
+            ${entry.Borrow ? `
+              <button class="renewbtn" onclick="renewRowBook('${entry.Book_ID}', '${entry.Student_ID}')">Renew</button>
+              <button class="submitbtn" onclick="submitRowBook('${entry.Book_ID}', '${entry.Student_ID}')">Submit</button>
+            ` : entry.Payment_Status === "NOT PAID" ? `
+              <button class="paymentbtn" onclick="confirmPayment('${entry.Student_ID}')">Pay</button>
+            ` : ""}
+          </td>`;
+      });
+    }
+
+    async function fetchSummary() {
+      try {
+        const stats = await window.pywebview.api.total_issued();
+        document.getElementById("total-books").textContent = stats.total;
+        document.getElementById("Issued").textContent = stats.issue;
+        document.getElementById("Submitted").textContent = stats.submit;
+        document.getElementById("Renewed").textContent = stats.renew;
+      } catch {
+        document.querySelectorAll("#total-books, #Issued, #Submitted, #Renewed")
+          .forEach(el => el.textContent = "❌");
+      }
+    }
+
+    document.getElementById("search-input").addEventListener("input", function () {
+      clearTimeout(this.searchTimeout);
+      this.searchTimeout = setTimeout(() => {
+        const val = this.value.toLowerCase();
+        const filtered = allBorrowData.filter(entry =>
+          Object.values(entry).some(v => String(v).toLowerCase().includes(val))
+        );
+        renderBorrowTable(filtered);
+      }, 300);
+    });
+
+
+
+    function goBack() {
+      window.pywebview?.api.go_back();
+    }
+
+    // Toggle dropdown
+    document.getElementById("download-button").addEventListener("click", function(e){
+      e.stopPropagation();
+      document.querySelector(".dropdown-content").classList.toggle("show");
+    });
+    window.addEventListener("click", function(){
+      const dropdown = document.querySelector(".dropdown-content");
+      if(dropdown.classList.contains("show")) dropdown.classList.remove("show");
+    });
+
+    function openDateModal() {
+      document.getElementById("date-modal").style.display = "flex";
+    }
+    function closeDateModal() {
+      document.getElementById("date-modal").style.display = "none";
+    }
+    
+
+    async function bookIssue() {
+      await window.pywebview.api.issue_book();
+    }
+
+    async function confirmAction(text, callback) {
+      document.getElementById("confirmation-text").textContent = text;
+      document.getElementById("confirmation-modal").style.display = "flex";
+      pendingAction = callback;
+    }
+
+    document.getElementById("confirm-btn").onclick = () => {
+      if (pendingAction) pendingAction();
+      document.getElementById("confirmation-modal").style.display = "none";
+    };
+    document.getElementById("cancel-btn").onclick = () => {
+      pendingAction = null;
+      document.getElementById("confirmation-modal").style.display = "none";
+    };
+
+    async function renewRowBook(bookID, studentID) {
+      const btn = event.target;
+        const originalText = btn.innerHTML;
+      confirmAction(`Renew book "${bookID}" for "${studentID}"?`, async () => {
+        btn.disabled = true;
+        btn.innerHTML = "⏳";
+        const res = await window.pywebview.api.renew_book({ bookID, studentid: studentID });
+        try{if(res.check_internet === false){alert("⚠️ No internet connection. Please check your network settings.");} 
+        else if (res.Renewed) {
+          showMessage(`✅ Renewed successfully.`, "green");
+          fetchBorrowRegister();
+        } else if (res.payment === false) {
+          showMessage(`⚠️ ${studentID} is blocked due to the unpaid fines.`, "red");
+        } else {
+          showMessage("❌ Renewal failed.", "red");
+        }}
+        finally {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
+      });
+    }
+
+    async function submitRowBook(bookID, studentID) {
+      const btn = event.target;
+        const originalText = btn.innerHTML;
+      confirmAction(`Submit book "${bookID}" for "${studentID}"?`, async () => {
+        
+        btn.disabled = true;
+        btn.innerHTML = "⏳";
+        const res = await window.pywebview.api.submit_book({ bookID, studentid: studentID });
+        try{if(res.check_internet === false){alert("⚠️ No internet connection. Please check your network settings.");} 
+        else if (res === true) {
+          showMessage(`✅ Submitted successfully`, "green");
+          fetchBorrowRegister();
+        } else if (res.success) {
+          showMessage(`⚠️ ${studentID} is blocked due to the unpaid fines.`, "red");
+        } else {
+          showMessage("❌ Submit failed", "red");
+        }}
+        finally {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
+      });
+    }
+
+    async function confirmPayment(studentID) {
+      const btn = event.target;
+        const originalText = btn.innerHTML;
+      confirmAction(`Process payment for "${studentID}"?`, async () => {
+        btn.disabled = true;
+        btn.innerHTML="⌛"
+        try {
+          const result = await window.pywebview.api.process_payment(studentID);
+          if(res.check_internet === false){alert("⚠️ No internet connection. Please check your network settings.");} 
+        else if (result === true) {
+            showMessage(`✅ Payment complete for ${studentID}`);
+            fetchBorrowRegister();
+            fetchSummary();
+          } else {
+            showMessage(`⚠️ Return all books first`, "red");
+          }
+        } catch {
+          showMessage("❌ Payment error", "red");
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        }
+      });
+    }
+    async function clearFields() {
+      document.getElementById("bookID").value = "";
+      document.getElementById("studentID").value = "";
+    }
+    window.addEventListener("beforeunload", () => {
+      if (borrowInterval) clearInterval(borrowInterval);
+    });
+    /* Download Button Logic */
+    function openDateRangeModal() { document.getElementById("date-modal").style.display = "flex"; }
+    function closeDateModal() { document.getElementById("date-modal").style.display = "none"; }
+
+    async function confirmDateDownload() {
+      const startDate = document.getElementById("start-date").value;
+      const endDate = document.getElementById("end-date").value;
+      if (!startDate || !endDate) { showMessage("⚠️ Please select both dates.", "orange"); return; }
+      closeDateModal();
+      triggerDownload(startDate, endDate);
+    }
+
+    async function downloadAll() { triggerDownload(); }
+
+    async function triggerDownload(startDate = null, endDate = null) {
+      const btn = document.getElementById("download-button");
+      btn.disabled = true;
+      const originalText = btn.textContent;
+      btn.textContent = "⌛";
+
+      try {
+        const result = await window.pywebview.api.download(startDate, endDate );
+        if (result === true) {
+          if (startDate && endDate) showMessage(`✅ Downloaded records from ${startDate} to ${endDate}`, "green");
+          else showMessage("✅ Downloaded full borrow list!", "green");
+        } else {
+          showMessage("❌ Error downloading list", "red");
+        }
+      } catch (e) {
+        console.error("Download failed:", e);
+        showMessage("❌ An error occurred", "red");
+      } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }
+    }
+
+    function openDateModal1() {
+  document.getElementById("date-modal1").style.display = "flex"; // Show modal
+}
+
+function closeDateModal1() {
+  document.getElementById("date-modal1").style.display = "none"; // Close modal
+}
+
+function applyDateFilter() {
+  const start = document.getElementById("start-date1").value;
+  const end = document.getElementById("end-date1").value;
+
+  if (!start || !end) {
+    showMessage("⚠️ Please select both dates!", "red");
+    return;
+  }
+
+  const filtered = allBorrowData.filter(entry => {
+    const dateStr = entry.Borrow_Date;
+    let borrowDate;
+
+    // Handle date format conversion if necessary
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      borrowDate = new Date(dateStr);
+    } else if (/^\d{2}-\d{2}-\d{4}$/.test(dateStr)) {
+      const parts = dateStr.split("-");
+      borrowDate = new Date(parts[2], parts[1] - 1, parts[0]);
+    } else {
+      return false; // skip invalid dates
+    }
+
+    return borrowDate >= new Date(start) && borrowDate <= new Date(end);
+  });
+
+  renderBorrowTable(filtered);
+  closeDateModal1(); // Close modal after applying filter
+}
+
+function resetDateFilter() {
+  document.getElementById("start-date1").value = "";
+  document.getElementById("end-date1").value = "";
+  renderBorrowTable(allBorrowData);
+}
+    setInterval(fetchBorrowRegister, 1000);
+  </script>
+  </body>
+</html>

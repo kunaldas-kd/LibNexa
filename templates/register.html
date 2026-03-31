@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Registration Portal</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #f1f5f9;
+            --accent: #06b6d4;
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --surface: rgba(255, 255, 255, 0.9);
+            --border: rgba(148, 163, 184, 0.2);
+            --shadow: rgba(0, 0, 0, 0.1);
+            --shadow-lg: rgba(0, 0, 0, 0.2);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #2C3E50 0%, #34495E 35%, #3498DB 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow-x: hidden;
+            padding: 20px 0;
+        }
+
+        /* Animated background elements */
+        .bg-decoration {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .bg-decoration::before,
+        .bg-decoration::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .bg-decoration::before {
+            width: 400px;
+            height: 400px;
+            top: -200px;
+            right: -200px;
+            animation-delay: -3s;
+        }
+
+        .bg-decoration::after {
+            width: 300px;
+            height: 300px;
+            bottom: -150px;
+            left: -150px;
+            animation-delay: -6s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(180deg); }
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-primary);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            box-shadow: 0 4px 6px -1px var(--shadow);
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 10px 25px -3px var(--shadow-lg);
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .register-container {
+            background: var(--surface);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            padding: 48px 40px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 700px;
+            box-shadow: 0 25px 50px -12px var(--shadow-lg);
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .status {
+            margin-bottom: 24px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 14px;
+            min-height: 20px;
+            padding: 12px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            white-space: pre-line;
+        }
+
+        .status.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .status.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .status.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .status:empty {
+            display: none;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 18px;
+            z-index: 2;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="number"] {
+            width: 100%;
+            padding: 16px 16px 16px 52px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 400;
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--text-primary);
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            transform: translateY(-1px);
+        }
+
+        input::placeholder {
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Remove default validation styles */
+        input:invalid {
+            border-color: var(--border);
+        }
+
+        input:valid {
+            border-color: var(--border);
+        }
+
+        /* Custom validation styles */
+        .form-group.error input {
+            border-color: var(--error);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .form-group.success input {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .error-message {
+            color: var(--error);
+            font-size: 12px;
+            margin-top: 4px;
+            margin-left: 16px;
+            display: none;
+        }
+
+        .form-group.error .error-message {
+            display: block;
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 18px;
+            border-radius: 12px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+            box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .btn-register:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px 0 rgba(16, 185, 129, 0.5);
+        }
+
+        .btn-register:active {
+            transform: translateY(0);
+        }
+
+        .btn-register:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-register::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-register:hover:not(:disabled)::before {
+            left: 100%;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .btn-register.loading .loading-spinner {
+            display: block;
+        }
+
+        .form-section {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        @media (max-width: 768px) {
+            .register-container {
+                margin: 10px;
+                padding: 32px 24px;
+                max-width: none;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+
+            .back-btn {
+                top: 16px;
+                left: 16px;
+            }
+
+            input[type="text"],
+            input[type="email"],
+            input[type="number"] {
+                padding: 14px 14px 14px 48px;
+                font-size: 16px;
+            }
+
+            .input-icon {
+                left: 14px;
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .register-container {
+                margin: 5px;
+                padding: 24px 16px;
+            }
+
+            .form-grid {
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-decoration"></div>
+    
+    <button class="back-btn" onclick="goBack()" aria-label="Go back">
+        ←
+    </button>
+
+    <div class="register-container">
+        <div class="header-section">
+            <h2>Library Registration</h2>
+            <p class="subtitle">Register your library with our digital platform</p>
+        </div>
+
+        <div id="status-msg" class="status"></div>
+
+        <form id="registrationForm" novalidate>
+            <div class="form-section">
+                <div class="section-title">📚 Library Information</div>
+                <div class="form-grid">
+                    <div class="form-group" id="libraryName-group">
+                        <div class="input-wrapper">
+                            <div class="input-icon">🏛️</div>
+                            <input type="text" id="libraryName" placeholder="Library Name" required>
+                        </div>
+                        <div class="error-message">Library name is required</div>
+                    </div>
+                    <div class="form-group" id="instituteName-group">
+                        <div class="input-wrapper">
+                            <div class="input-icon">🏫</div>
+                            <input type="text" id="instituteName" placeholder="Institute Name" required>
+                        </div>
+                        <div class="error-message">Institute name is required</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-title">📍 Contact Details</div>
+                <div class="form-grid">
+                    <div class="form-group" id="instituteEmail-group">
+                        <div class="input-wrapper">
+                            <div class="input-icon">📧</div>
+                            <input type="email" id="instituteEmail" placeholder="Institute Email" required>
+                        </div>
+                        <div class="error-message">Valid email is required</div>
+                    </div>
+                    <div class="form-group" id="address-group">
+                        <div class="input-wrapper">
+                            <div class="input-icon">📍</div>
+                            <input type="text" id="address" placeholder="Address" required>
+                        </div>
+                        <div class="error-message">Address is required</div>
+                    </div>
+                    <div class="form-group" id="district-group">
+                        <div class="input-wrapper">
+                            <div class="input-icon">🏘️</div>
+                            <input type="text" id="district" placeholder="District" required>
+                        </div>
+                        <div class="error-message">District is required</div>
+                    </div>
+                    <div class="form-group" id="state-group">
+                        <div class="input-wrapper">
+                            <div class="input-icon">🗺️</div>
+                            <input type="text" id="state" placeholder="State" required>
+                        </div>
+                        <div class="error-message">State is required</div>
+                    </div>
+                    <div class="form-group" id="country-group">
+                        <div class="input-wrapper">
+                            <div class="input-icon">🌍</div>
+                            <input type="text" id="country" placeholder="Country" required>
+                        </div>
+                        <div class="error-message">Country is required</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-title">⚙️ Library Settings</div>
+                <div class="form-grid">
+                    <div class="form-group" id="latefine-group">
+                        <div class="input-wrapper">
+                            <div class="input-icon">💰</div>
+                            <input type="number" id="latefine" placeholder="Late Fine (Per Day)" min="0" step="0.01" required>
+                        </div>
+                        <div class="error-message">Late fine must be 0 or greater</div>
+                    </div>
+                    <div class="form-group" id="borrowingPeriod-group">
+                        <div class="input-wrapper">
+                            <div class="input-icon">📅</div>
+                            <input type="number" id="borrowingPeriod" placeholder="Borrowing Period (Days)" min="1" max="365" required>
+                        </div>
+                        <div class="error-message">Borrowing period must be between 1-365 days</div>
+                    </div>
+                    <div class="form-group" id="AlottedBooks-group">
+                        <div class="input-wrapper">
+                            <div class="input-icon">📖</div>
+                            <input type="number" id="AlottedBooks" placeholder="Books Per Member" min="1" max="50" required>
+                        </div>
+                        <div class="error-message">Books per member must be between 1-50</div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-register" id="registerBtn">
+                <div class="loading-spinner"></div>
+                <span class="btn-text">Create Library Account</span>
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // Email validation regex
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        function showMessage(message, type = "success") {
+            const msgBox = document.getElementById("status-msg");
+            msgBox.textContent = message;
+            msgBox.className = `status ${type}`;
+            
+            // Auto-hide after 8 seconds for success messages
+            if (type === "success") {
+                setTimeout(() => {
+                    msgBox.textContent = "";
+                    msgBox.className = "status";
+                }, 8000);
+            }
+        }
+
+        function validateField(fieldId) {
+            const field = document.getElementById(fieldId);
+            const group = document.getElementById(fieldId + "-group");
+            const value = field.value.trim();
+            
+            let isValid = true;
+            
+            if (!value) {
+                isValid = false;
+            } else if (fieldId === "instituteEmail" && !emailRegex.test(value)) {
+                isValid = false;
+            } else if (fieldId === "latefine") {
+                const num = parseFloat(value);
+                isValid = !isNaN(num) && num >= 0;
+            } else if (fieldId === "borrowingPeriod") {
+                const num = parseInt(value);
+                isValid = !isNaN(num) && num >= 1 && num <= 365;
+            } else if (fieldId === "AlottedBooks") {
+                const num = parseInt(value);
+                isValid = !isNaN(num) && num >= 1 && num <= 50;
+            }
+            
+            if (isValid) {
+                group.classList.remove("error");
+                group.classList.add("success");
+            } else {
+                group.classList.remove("success");
+                group.classList.add("error");
+            }
+            
+            return isValid;
+        }
+
+        function validateForm() {
+            const fieldIds = [
+                "libraryName", "instituteName", "instituteEmail", 
+                "address", "district", "state", "country", 
+                "latefine", "borrowingPeriod", "AlottedBooks"
+            ];
+            
+            let isFormValid = true;
+            
+            fieldIds.forEach(fieldId => {
+                if (!validateField(fieldId)) {
+                    isFormValid = false;
+                }
+            });
+            
+            return isFormValid;
+        }
+
+        // Add real-time validation
+        document.addEventListener("DOMContentLoaded", function() {
+            const fieldIds = [
+                "libraryName", "instituteName", "instituteEmail", 
+                "address", "district", "state", "country", 
+                "latefine", "borrowingPeriod", "AlottedBooks"
+            ];
+            
+            fieldIds.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                field.addEventListener("blur", () => validateField(fieldId));
+                field.addEventListener("input", () => {
+                    const group = document.getElementById(fieldId + "-group");
+                    if (group.classList.contains("error")) {
+                        validateField(fieldId);
+                    }
+                });
+            });
+
+            // Form submission
+            document.getElementById("registrationForm").addEventListener("submit", function(e) {
+                e.preventDefault();
+                register();
+            });
+        });
+
+        async function register() {
+            const registerBtn = document.getElementById("registerBtn");
+            
+            // Validate form first
+            if (!validateForm()) {
+                showMessage("⚠️ Please fix the errors above before submitting.", "error");
+                return;
+            }
+
+            // Show loading state
+            registerBtn.disabled = true;
+            registerBtn.classList.add("loading");
+            const btnText = registerBtn.querySelector(".btn-text");
+            btnText.textContent = "Registering...";
+
+            const data = {
+                libraryName: document.getElementById("libraryName").value.trim(),
+                instituteName: document.getElementById("instituteName").value.trim(),
+                instituteEmail: document.getElementById("instituteEmail").value.trim(),
+                address: document.getElementById("address").value.trim(),
+                district: document.getElementById("district").value.trim(),
+                state: document.getElementById("state").value.trim(),
+                country: document.getElementById("country").value.trim(),
+                latefine: document.getElementById("latefine").value.trim(),
+                borrowingPeriod: document.getElementById("borrowingPeriod").value.trim(),
+                AlottedBooks: document.getElementById("AlottedBooks").value.trim()
+            };
+
+            try {
+                if (window.pywebview && window.pywebview.api) {
+                    const response = await window.pywebview.api.submit_registration(data);
+                    console.log("Registration response:", response);
+                    
+                    if (response.check_internet === false) {
+                        showMessage("⚠️ No internet connection. Please check your network settings.", "error");
+                    } else if (response.valid_email === false) {
+                        showMessage("⚠️ Invalid email structure.", "error");
+                    } else if (response.is_valid === false) {
+                        showMessage("⚠️ Invalid or duplicate email.", "error");
+                    } else if (response.Status === true) {
+                        showMessage("✅ Registration successful!\n\n📁 Check the Downloads folder for Excel templates.", "success");
+                        clearFields();
+                    } else {
+                        showMessage(`⚠️ Registration failed: ${response.message || 'Unknown error'}`, "error");
+                    }
+                } else {
+                    // Fallback for testing without PyWebView
+                    console.log("PyWebView API not available, simulating success");
+                    showMessage("✅ Registration successful! (Demo mode)", "success");
+                    clearFields();
+                }
+            } catch (error) {
+                console.error("Error during registration:", error);
+                showMessage("❌ Registration failed. Please try again.", "error");
+            }
+
+            resetButton();
+        }
+
+        function resetButton() {
+            const registerBtn = document.getElementById("registerBtn");
+            const btnText = registerBtn.querySelector(".btn-text");
+            
+            registerBtn.disabled = false;
+            registerBtn.classList.remove("loading");
+            btnText.textContent = "Create Library Account";
+        }
+
+        function clearFields() {
+            const fieldIds = [
+                "libraryName", "instituteName", "instituteEmail", 
+                "address", "district", "state", "country", 
+                "latefine", "borrowingPeriod", "AlottedBooks"
+            ];
+            
+            fieldIds.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                const group = document.getElementById(fieldId + "-group");
+                if (field) {
+                    field.value = "";
+                }
+                if (group) {
+                    group.classList.remove("error", "success");
+                }
+            });
+        }
+
+        function goBack() {
+            if (window.pywebview && window.pywebview.api) {
+                window.pywebview.api.go_back();
+            } else {
+                console.log("Go back clicked (PyWebView API not available)");
+                showMessage("❌ Unable to go back - API not available.", "error");
+            }
+        }
+    </script>
+</body>
+</html>
